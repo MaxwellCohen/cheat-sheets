@@ -1,2 +1,2 @@
 # cheat-sheets
-collection of 
+collection of various cheatsheets
