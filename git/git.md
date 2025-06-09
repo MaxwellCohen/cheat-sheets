@@ -74,8 +74,10 @@ Rebasing checkouts out the branch you are rebasing and then applies the changes 
 `git rebase -it <branch-to-rebase-onto>`
 
 The current changes are changes from the branch you are rebasing onto and the incoming changes are changes from the branch you are rebasing.
--current changes -- incoming branch
--incoming changes -- my changes.
+
+-current changes -- "production code"
+
+-incoming changes -- **my** changes.
 
 when you rebase you can use the following commands to help you:
 
