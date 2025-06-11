@@ -1,4 +1,7 @@
+
 # Git cheat sheet
+
+This cheat sheet is a collection of my favorite git commands and tips.
 
 - [Git cheat sheet](#git-cheat-sheet)
 - [Git settings to make your life better](#git-settings-to-make-your-life-better)
