@@ -17,25 +17,25 @@ This cheat sheet is a collection of my favorite git commands and tips.
 ```bash
 # create a remote branch on push without having to do `git branch --set-upstream-to <remote-branch>`. This is my favorite "new" get feature. 
 
-git config --global push.autoSetupRemote true
+git config --global push.autoSetupRemote true;
 
 # set VSCode as default editor for git commits messages
-git config --global core.editor "code --wait"
+git config --global core.editor "code --wait";
 
 
 # git rerere is a tool that helps you avoid the merge conflicts by remembering the state of the files after the last merge.
-git config rerere.enabled true
+git config rerere.enabled true;
 
 # some of my favorite git aliases 
-git config --global alias.co checkout
-git config --global alias.ci commit
-git config --global alias.st status
-git config --global alias.br branch
-git config --global alias.unstage 'reset HEAD --'  # unstage all changes
-git config --global alias.last 'log -1 HEAD'  # show last commit
-git config --global alias.undo 'reset HEAD~1'  # undo last commit
-git config --global alias.main 'checkout main'  # checkout main branch
-git config --global alias.logs log # I never remember the command to show logs is log or logs so it is now both 
+git config --global alias.co checkout;
+git config --global alias.ci commit;
+git config --global alias.st status;
+git config --global alias.br branch;
+git config --global alias.unstage 'reset HEAD --';  # unstage all changes
+git config --global alias.last 'log -1 HEAD';  # show last commit
+git config --global alias.undo 'reset HEAD~1';  # undo last commit
+git config --global alias.main 'checkout main';  # checkout main branch
+git config --global alias.logs log; # I never remember the command to show logs is log or logs so it is now both 
 
 ```
 
