@@ -1,5 +1,5 @@
 
-#Image Srcset logic for picking an image
+# Image Srcset logic for picking an image
 
 
 ```mermaid
