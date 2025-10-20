@@ -74,7 +74,7 @@ Note: oh my zsh git addon has `gstu` alias for this too
 
 Rebasing checkouts out the branch you are rebasing and then applies the changes from the branch you are rebasing onto. 
 
-`git rebase -it <branch-to-rebase-onto>`
+`git rebase -i <branch-to-rebase-onto>`
 
 The current changes are changes from the branch you are rebasing onto and the incoming changes are changes from the branch you are rebasing.
 
