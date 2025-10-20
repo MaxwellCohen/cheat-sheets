@@ -90,5 +90,8 @@ when you rebase you can use the following commands to help you:
 - `git rebase --edit-todo` - edit the todo list
 - `git rebase --onto <new-branch> <branch-to-rebase-onto>` - rebase onto a new branch
 
+> [!IMPORTANT]
+> When pushing a rebased branch to github/gitlab/bitbucket make sure to do a force push `git push -f` or you might not see your changes 
+
 
 
