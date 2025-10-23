@@ -21,7 +21,7 @@ graph TB;
     `"]
 
     B --> B1["` <code>display:inline</code>
-    Element only takes necessary width; flows within text. Default for <span>, <a>, <strong>.
+    Element only takes necessary width; flows within text. 
     `"]
     B1 --> B11["` <code>display:inline-block</code>
     Hybrid of inline and block; flows inline but respects width/height properties.`"]
@@ -34,7 +34,7 @@ graph TB;
     `"]
 
     C --> C1["` display:block
-    Element takes full width; starts on new line. Default for <div>, <p>, <h1>.
+    Element takes full width; starts on new line.
     `"]
     C --> C2["` children modifiers`"]
     C2 --> C21["` <code>display:flex</code>
