@@ -1,6 +1,6 @@
 # Display Properties
 
-Css has severals ways to control the display of elements. 
+CSS has severals ways to control the display of elements. 
 
 ```mermaid
 kanban
@@ -43,7 +43,7 @@ graph TB;
 ```
 
 
-## I want hide or ignore elements
+## hide or ignore elements
 ```mermaid
 graph TB;
     A["` What do you want to hide/ignore?`"]
@@ -58,7 +58,7 @@ graph TB;
 >[!WARNING]
 > Don not set Interactive elements like inputs, buttons, or links to `display:contents` because they will will not be able to be used by your users.
 
-## I want elements to be next to each other
+## Inline Elements
 
 ```mermaid
 graph TB;
@@ -78,7 +78,7 @@ graph TB;
 ```
 
 
-## I want to control the size of the element
+## block elements
 
 ```mermaid
 graph TB;
