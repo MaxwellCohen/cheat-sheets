@@ -43,7 +43,7 @@ graph TB;
 ```
 
 
-## hide or ignore elements
+## Hide or Ignore Elements
 ```mermaid
 graph TB;
     A["` What do you want to hide/ignore?`"]
@@ -78,7 +78,7 @@ graph TB;
 ```
 
 
-## block elements
+## Block Elements
 
 ```mermaid
 graph TB;
