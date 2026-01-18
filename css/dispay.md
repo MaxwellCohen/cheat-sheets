@@ -2,96 +2,30 @@
 
 CSS has several ways to control the display of elements. The `display` property determines how an element is rendered and how it interacts with other elements in the document flow.
 
-```mermaid
-kanban
-    title CSS Display Properties - Control Spectrum
-    section Browser Controlled
-        display:none::"Removed from flow"
-        display:contents::"Wrapper removed"
-    section Inline Flow
-        display:inline::"Text flow only"
-        display:inline-block::"Inline + dimensions"
-        display:inline-flex::"Inline flex container"
-        display:inline-grid::"Inline grid container"
-    section Block Level
-        display:block::"Full width, new line"
-        display:flex::"Flexbox layout"
-        display:grid::"Grid layout"
-```
-
-
-
-
-## What do you want to do with content? 
+## Flowchart: How to Pick a `display` Property
 
 ```mermaid
-graph TB;
-    A0["` How do you want to display the content?`"]
-    A["` Do you want to hide or ignore elements?`"]
-    A1["` Use <code>display:none</code> or <code>display:contents</code>`"]
-    B["` Do you want elements next to each other on the same line?`"]
-    b1["` Use 'inline' display properties<br/>inline, inline-block, inline-flex, inline-grid`"]
-    C["` Use 'block' display properties<br/>block, flex, grid`"]
-    A0 --> A
-    A --Yes--> A1
-    A --"No"--> B
-    B --"Yes"--> b1
-    B --"No"--> C
+flowchart TD
+  A["What is your layout goal?"] --> B{"Show/hide element?"}
+  B -- "Hide (remove from flow)" --> N[display: none]
+  B -- "Show" --> C{"Does it wrap other elements or only text?"}
+  C -- "Only text (no block context)" --> INL[display: inline]
+  C -- "Wraps other elements" --> D{"Flexible or grid layout inside?"}
+  D -- "No, just stack normally" --> BLK[display: block]
+  D -- "Yes, needs flexible row/column" --> E{"1D (rows or columns) or 2D (grid)?"}
+  E -- "1D (flex)" --> FLEXCHK{"Should it flow inline with text?"}
+  FLEXCHK -- "Yes" --> INFLEX[display: inline-flex]
+  FLEXCHK -- "No"  --> FLEX[display: flex]
+  E -- "2D (grid)" --> GRIDCHK{"Should it flow inline with text?"}
+  GRIDCHK -- "Yes" --> INGRID[display: inline-grid]
+  GRIDCHK -- "No"  --> GRID[display: grid]
+  C -- "Remove wrapper, keep children" --> CONTENTS[display: contents]
+  C -- "Show block but flow inline" --> INLBLK[display: inline-block]
 ```
 
-
-## Hide or Ignore Elements
-```mermaid
-graph TB;
-    A["` What do you want to hide/ignore?`"]
-    A1["` I don't want to see this element or its children`"]
-    A2["` This element is for grouping only<br/>Children should participate in parent's layout`"]
-    A11["` Use <code>display:none</code><br/>Element is hidden and removed from document flow<br/>Takes no space`"]
-    A21["` Use <code>display:contents</code><br/>Element's box is invisible<br/>Children participate as if direct children of parent`"]
-    A --> A1
-    A --> A2
-    A1 --> A11
-    A2 --> A21
-```
->[!WARNING]
-> Don not set Interactive elements like inputs, buttons, or links to `display:contents` because they will will not be able to be used by your users.
-
-## Inline Elements
-
-```mermaid
-graph TB;
-    B["` Need inline flow (elements on same line)?`"]
-    B1["` Basic inline<br/>No width/height control`"]
-    B2["` Need layout control for children?`"]
-    B11["` <code>display:inline</code><br/>Flows with text<br/>No width/height`"]
-    B12["` <code>display:inline-block</code><br/>Flows inline + respects width/height<br/>All margins/padding work`"]
-    B21["` <code>display:inline-flex</code><br/>Inline flex container<br/>Children are flex items`"]
-    B22["` <code>display:inline-grid</code><br/>Inline grid container<br/>Children are grid items`"]
-    B --> B1
-    B --> B2
-    B1 --> B11
-    B1 --> B12
-    B2 --> B21
-    B2 --> B22
-```
-
-
-## Block Elements
-
-```mermaid
-graph TB;
-    C["` Need block-level element (full width, new line)?`"]
-    C1["` Basic block<br/>No special layout for children`"]
-    C2["` Need layout control for children?`"]
-    C11["` <code>display:block</code><br/>Takes full width<br/>Starts on new line<br/>Standard block behavior`"]
-    C21["` <code>display:flex</code><br/>Flexbox container<br/>1D layout (row or column)<br/>Flexible spacing/alignment`"]
-    C22["` <code>display:grid</code><br/>Grid container<br/>2D layout (rows and columns)<br/>Precise positioning`"]
-    C --> C1
-    C --> C2
-    C1 --> C11
-    C2 --> C21
-    C2 --> C22
-```
+**How to use:**  
+- Start at the top and answer each question to choose the correct `display` property for your CSS.
+- Refer to the options for specialized needs such as hiding, container removal, grid, or flex layouts.
 
 ## Quick Reference Table
 
@@ -106,6 +40,25 @@ graph TB;
 | `block` | Full width, new line | Content-based | Yes | Yes | Structural elements |
 | `flex` | Full width, new line | Flexbox | Yes | Yes | Flexible layouts |
 | `grid` | Full width, new line | Grid | Yes | Yes | 2D grid layouts |
+
+## Property Compatibility Reference
+
+### What Works with Each Display Type
+
+| Property | `inline` | `inline-block` | `block` | `flex` | `grid` |
+|:---------|:---------|:----------------|:--------|:-------|:-------|
+| `width` | ❌ | ✅ | ✅ | ✅ | ✅ |
+| `height` | ❌ | ✅ | ✅ | ✅ | ✅ |
+| `margin` (all) | ⚠️ Horizontal only | ✅ | ✅ | ✅ | ✅ |
+| `padding` (all) | ⚠️ Horizontal affects layout | ✅ | ✅ | ✅ | ✅ |
+| `vertical-align` | ✅ | ✅ | ❌ | ❌ | ❌ |
+| `text-align` | ❌ (on element) | ❌ (on element) | ✅ | ❌ | ❌ |
+| `flexbox properties` | ❌ | ❌ | ❌ | ✅ | ❌ |
+| `grid properties` | ❌ | ❌ | ❌ | ❌ | ✅ |
+| `float` | ⚠️ Converts to block | ✅ | ✅ | ❌ | ❌ |
+| `clear` | ❌ | ✅ | ✅ | ❌ | ❌ |
+
+---
 
 ## Detailed Examples
 
@@ -506,25 +459,6 @@ CSS Grid container. Creates a 2D grid layout for precise positioning.
 - Dashboard layouts
 - Responsive image galleries
 - Form layouts
-
----
-
-## Property Compatibility Reference
-
-### What Works with Each Display Type
-
-| Property | `inline` | `inline-block` | `block` | `flex` | `grid` |
-|:---------|:---------|:----------------|:--------|:-------|:-------|
-| `width` | ❌ | ✅ | ✅ | ✅ | ✅ |
-| `height` | ❌ | ✅ | ✅ | ✅ | ✅ |
-| `margin` (all) | ⚠️ Horizontal only | ✅ | ✅ | ✅ | ✅ |
-| `padding` (all) | ⚠️ Horizontal affects layout | ✅ | ✅ | ✅ | ✅ |
-| `vertical-align` | ✅ | ✅ | ❌ | ❌ | ❌ |
-| `text-align` | ❌ (on element) | ❌ (on element) | ✅ | ❌ | ❌ |
-| `flexbox properties` | ❌ | ❌ | ❌ | ✅ | ❌ |
-| `grid properties` | ❌ | ❌ | ❌ | ❌ | ✅ |
-| `float` | ⚠️ Converts to block | ✅ | ✅ | ❌ | ❌ |
-| `clear` | ❌ | ✅ | ✅ | ❌ | ❌ |
 
 ---
 
