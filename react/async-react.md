@@ -131,6 +131,27 @@ function ItemEditor({ itemId }: { itemId: number }) {
 
 ### Optimistic Updates with useOptimistic
 
+```mermaid
+flowchart TD
+    A["`Component renders<br/>(optimistic value = value passed to)`"]
+    A --> T_start
+    
+    subgraph Transaction["`Transition or Action when optimistic value is shown`"]
+        T_start["`Transition or Action starts`"]
+        T_start --> C["`setOptimistic called with an optimistic value`"]
+        C --> D["`Component rerenders with optimistic value from setOptimistic`"]
+        D --> E["`Async action runs<br/>(submit data, wait for response)`"]
+        E -->|Success| G["`State is updated from the async action`"]
+        E -->|Failure| H["`no value passed to useOptimistic is updated`"]
+        G --> T_end["`Transition or Action ends`"]
+        H --> T_end
+    end
+    
+    T_end --> O["`Component renders<br/>(optimistic value = value passed to)`"]
+```
+
+
+
 ```tsx
 import { useOptimistic, useTransition } from 'react';
 
@@ -559,3 +580,5 @@ function ConditionalData({ shouldLoad }: { shouldLoad: boolean }) {
   );
 }
 ```
+
+
