@@ -580,5 +580,21 @@ function ConditionalData({ shouldLoad }: { shouldLoad: boolean }) {
   );
 }
 ```
+## Sync React to Async React State Flow
 
+```mermaid
+flowchart LR
+  subgraph SR["Sync React"]
+    C["useState"]
+    A["useReducer"]
+  end
 
+  subgraph AR["Async React Actions"]
+    D["useState + useOptimistic"]
+    B["useActionState"]
+    B1["useActionState + useOptimistic"]
+  end
+
+  C --> D
+  A --> B --> B1
+```
