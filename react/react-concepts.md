@@ -2,51 +2,64 @@
 
 ```mermaid
 flowchart TB
-    subgraph Debugging["Debugging"]
-        useDebugValue["useDebugValue - better debugging messages in dev tools"]
+    %% Invisible links force 2x3 grid: row1 = Debugging, Optimizations, Escape | row2 = Sync, Data, Async
+
+    subgraph Debugging["🔍 Debugging"]
+        direction TB
+        useDebugValue["useDebugValue - better debugging in dev tools"]
         Profiler["&lt;Profiler&gt; - measure render cost"]
     end
 
-    subgraph Optimizations["Optimizations"]
-        useMemo["useMemo - memoize calculated values"]
-        useCallback["useCallback - memoize functions for stable references"]
-        reactCompiler["react compiler - build step to greatly optimize at runtime"]
-        Activity["&lt;Activity&gt; - delay rendering until needed"]
-        Fragment["&lt;Fragment&gt; (&lt;&gt;) - keep related subparts in same component"]
+    subgraph Optimizations["⚡ Optimizations"]
+        direction TB
+        useMemo["useMemo - memoize values"]
+        useCallback["useCallback - stable refs"]
+        reactCompiler["react compiler - runtime optimize"]
+        Activity["&lt;Activity&gt; - delay render"]
+        Fragment["&lt;Fragment&gt; - group subparts"]
     end
 
-    subgraph EscapeHatches["Escape hatches"]
-        useLayoutEffect["useLayoutEffect - update styles on render"]
-        useEffect["useEffect - run effects based on state change"]
-        useEffectEvent["useEffectEvent - separate events from Effects"]
-        useRef["useRef - stable data between renders or ref to DOM/component"]
-        useImperativeHandle["useImperativeHandle - customize ref exposed to parent"]
-        useInsertionEffect["useInsertionEffect - for CSS-in-JS"]
-        useId["useId - unique stable id for server and client"]
+    subgraph EscapeHatches["🚪 Escape hatches"]
+        direction TB
+        useLayoutEffect["useLayoutEffect - styles on render"]
+        useEffect["useEffect - effects on state"]
+        useEffectEvent["useEffectEvent - events vs Effects"]
+        useRef["useRef - stable ref or DOM"]
+        useImperativeHandle["useImperativeHandle - customize ref"]
+        useInsertionEffect["useInsertionEffect - CSS-in-JS"]
+        useId["useId - stable id SSR/client"]
     end
 
-    subgraph SyncState["Sync State"]
-        createContext["createContext - context value and provider"]
-        useContext["useContext - consume a context value"]
-        useState["useState - make a single value reactive"]
-        useReducer["useReducer - update state with reducer"]
-        useSyncExternalStore["useSyncExternalStore - subscribe to external store"]
+    subgraph SyncState["🔄 Sync State"]
+        direction TB
+        createContext["createContext - provider"]
+        useContext["useContext - consume context"]
+        useState["useState - reactive value"]
+        useReducer["useReducer - reducer state"]
+        useSyncExternalStore["useSyncExternalStore - external store"]
     end
 
-    subgraph DataLoading["Data loading"]
-        Suspense["&lt;Suspense&gt; - wait until data is loaded"]
-        use["use - get value of promises and context"]
+    subgraph DataLoading["📥 Data loading"]
+        direction TB
+        Suspense["&lt;Suspense&gt; - wait for data"]
+        use["use - promises and context"]
     end
 
-    subgraph AsyncReact["Async React"]
-        formAction["&lt;form action&gt; - native form actions"]
-        startTransition["startTransition - mark update as non-urgent (function)"]
-        useTransition["useTransition - mark update as non-urgent (hook)"]
-        useActionState["useActionState - reducer for form/async actions"]
-        useDeferredValue["useDeferredValue - defer updating part of the UI"]
-        useOptimistic["useOptimistic - shadow value while transition runs"]
-        ViewTransition["&lt;ViewTransition&gt; - animate transitions"]
+    subgraph AsyncReact["⏳ Async React"]
+        direction TB
+        formAction["&lt;form action&gt; - native actions"]
+        startTransition["startTransition - non-urgent fn"]
+        useTransition["useTransition - non-urgent hook"]
+        useActionState["useActionState - form/async reducer"]
+        useDeferredValue["useDeferredValue - defer UI"]
+        useOptimistic["useOptimistic - shadow during transition"]
+        ViewTransition["&lt;ViewTransition&gt; - animate"]
     end
+
+    %% Layout: two rows of three
+    Debugging ~~~ Optimizations ~~~ EscapeHatches
+    SyncState ~~~ DataLoading ~~~ AsyncReact
+    EscapeHatches ~~~ SyncState
 
     %% Debugging ↔ Optimizations
     Profiler -->|measures| useMemo
