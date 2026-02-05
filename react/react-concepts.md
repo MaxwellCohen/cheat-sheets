@@ -1,9 +1,8 @@
 # React Concepts 
 
 ```mermaid
-flowchart TB
-    %% Invisible links force 2x3 grid: row1 = Debugging, Optimizations, Escape | row2 = Sync, Data, Async
-
+flowchart TD
+    %% Debugging, Optimizations, Escape hatches
     subgraph Debugging["🔍 Debugging"]
         direction TB
         useDebugValue["useDebugValue - better debugging in dev tools"]
@@ -30,8 +29,19 @@ flowchart TB
         useId["useId - stable id SSR/client"]
     end
 
+    %% Profiler -->|measures| useMemo
+    %% Profiler -->|measures| useCallback
+    %% useEffectEvent -->|used inside| useEffect
+    %% useImperativeHandle -->|wraps| useRef
+    %% useMemo -->|returns stable ref like| useRef
+```
+
+```mermaid
+flowchart LR
+    %% Sync State, Data loading, Async React
+
     subgraph SyncState["🔄 Sync State"]
-        direction TB
+        direction LR
         createContext["createContext - provider"]
         useContext["useContext - consume context"]
         useState["useState - reactive value"]
@@ -40,13 +50,13 @@ flowchart TB
     end
 
     subgraph DataLoading["📥 Data loading"]
-        direction TB
+        direction LR
         Suspense["&lt;Suspense&gt; - wait for data"]
         use["use - promises and context"]
     end
 
     subgraph AsyncReact["⏳ Async React"]
-        direction TB
+        direction LR
         formAction["&lt;form action&gt; - native actions"]
         startTransition["startTransition - non-urgent fn"]
         useTransition["useTransition - non-urgent hook"]
@@ -56,25 +66,8 @@ flowchart TB
         ViewTransition["&lt;ViewTransition&gt; - animate"]
     end
 
-    %% Layout: two rows of three
-    Debugging ~~~ Optimizations ~~~ EscapeHatches
-    SyncState ~~~ DataLoading ~~~ AsyncReact
-    EscapeHatches ~~~ SyncState
-
-    %% Debugging ↔ Optimizations
-    Profiler -->|measures| useMemo
-    Profiler -->|measures| useCallback
-
-    %% Escape hatches ↔ Sync State
-    useEffect -->|reads/writes| useState
-    useEffect -->|reads/writes| useReducer
-    useLayoutEffect -->|reads/writes| useState
-    useRef -->|persists across renders like| useState
-    useImperativeHandle -->|wraps| useRef
-
-    %% Escape hatches ↔ Optimizations
-    useEffectEvent -->|used inside| useEffect
-    useMemo -->|returns stable ref like| useRef
+    %% Layout
+    DataLoading ~~~ SyncState  ~~~ AsyncReact
 
     %% Sync State internal
     createContext -->|provides to| useContext
