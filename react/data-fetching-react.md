@@ -4,13 +4,14 @@ React offers several ways to load data: client-side with `useEffect` or librarie
 
 ## Quick comparison
 
-| Approach              | Where it runs | Best for                          |
-|-----------------------|---------------|------------------------------------|
-| `useEffect`           | Client        | Simple one-off fetches             |
-| useQuery / SWR        | Client        | Cached, refetchable client data    |
-| Async Server Component | Server        | Server loading, no Suspense        |
-| Server Component + `use()` | Server → Client | Initial page data, streaming   |
-| `"use client"` + `use()` | Client        | Client-side promises + Suspense   |
+| Approach              | Where it runs | Best for                                  |
+|-----------------------|---------------|--------------------------------------------|
+| `useEffect`           | Client        | Simple one-off fetches                     |
+| useQuery / SWR        | Client        | Cached, refetchable client data            |
+| Router loaders        | Server / isomorphic | Route-level data before render (framework) |
+| Async Server Component | Server       | Server loading, no Suspense                |
+| Server Component + `use()` | Server → Client | Initial page data, streaming           |
+| `"use client"` + `use()` | Client       | Client-side promises + Suspense            |
 
 
 ## `useEffect`
@@ -127,6 +128,101 @@ function UserProfile({ userId }: { userId: string }) {
 - Extra dependency and bundle size.
 - Learning curve for query keys, invalidation, and options.
 - Overkill for very simple or one-off fetches.
+
+---
+
+## Router data loaders
+
+Many frameworks let you load data at the **route** level so it’s ready before the page component renders. The router runs a loader (or equivalent) and passes the result into the page. This avoids client waterfalls for initial data and keeps loading logic next to the route.
+
+### TanStack Start (TanStack Router)
+
+TanStack Start uses **loaders** (and `beforeLoad`) that run on the server for the first request and on the client for later navigations. Use `useLoaderData()` in the route component.
+
+```tsx
+import { createFileRoute } from '@tanstack/react-router';
+
+export const Route = createFileRoute('/posts/$id')({
+  loader: async ({ params }) => {
+    const res = await fetch(`https://api.example.com/posts/${params.id}`);
+    if (!res.ok) throw new Error('Failed to fetch');
+    return res.json();
+  },
+  component: PostPage,
+});
+
+function PostPage() {
+  const post = Route.useLoaderData();
+  return (
+    <article>
+      <h1>{post.title}</h1>
+      <p>{post.body}</p>
+    </article>
+  );
+}
+```
+
+`beforeLoad` runs parent → child and is good for auth; `loader` runs after and is for data. Both are isomorphic (server on first load, client on navigation).
+
+### Next.js Pages Router — `getServerSideProps`
+
+In the Pages Router, **getServerSideProps** runs on the server on every request. It receives `context` (with `params`, `query`, `req`, `res`). Return `{ props }` and the page receives them as props.
+
+```tsx
+// pages/post/[id].tsx
+export async function getServerSideProps(context) {
+  const { id } = context.params;
+  const res = await fetch(`https://api.example.com/posts/${id}`);
+  if (!res.ok) return { notFound: true };
+  const post = await res.json();
+  return { props: { post } };
+}
+
+export default function PostPage({ post }: { post: Post }) {
+  return (
+    <article>
+      <h1>{post.title}</h1>
+      <p>{post.body}</p>
+    </article>
+  );
+}
+```
+
+Use `getStaticProps` for static data at build time; `getServerSideProps` is for per-request server data.
+
+### React Router (v6.4+ data APIs)
+
+With the data router (e.g. `createBrowserRouter`), define a **loader** on the route. It can run on the server (SSR) or client. The page (and any child) reads the result with `useLoaderData()`.
+
+```tsx
+import { useLoaderData } from 'react-router';
+
+export async function loader({ params }) {
+  const res = await fetch(`https://api.example.com/posts/${params.id}`);
+  if (!res.ok) throw new Response('Not found', { status: 404 });
+  return res.json();
+}
+
+export default function PostPage() {
+  const post = useLoaderData();
+  return (
+    <article>
+      <h1>{post.title}</h1>
+      <p>{post.body}</p>
+    </article>
+  );
+}
+```
+
+React Router also supports **clientLoader** for client-only loading. Loader data is stable and safe to use in dependency arrays.
+
+**Summary**
+
+| Framework           | API                     | Where it runs        |
+|---------------------|-------------------------|----------------------|
+| TanStack Start      | `loader`, `beforeLoad`  | Server then client   |
+| Next.js Pages       | `getServerSideProps`    | Server only          |
+| React Router        | `loader`, `clientLoader`| Server or client     |
 
 ---
 
