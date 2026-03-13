@@ -20,22 +20,6 @@ The `<img>` and `<picture>` elements embed images in a web page. **`<img>`** dis
 
 ---
 
-## Table of contents
-
-1. [\<img\> element attributes](#img-element-attributes)
-2. [Basic & responsive examples](#basic-image-example)
-3. [Attribute details](#attribute-details) (src, alt, width/height, srcset, sizes, loading, etc.)
-4. [The \<picture\> element](#the-picture-element)
-5. [Rendered vs intrinsic pixels](#understanding-pixels-rendered-size-vs-intrinsic-size)
-6. [Display and cropping](#display-and-cropping) (object-fit, aspect-ratio, focal point)
-7. [Srcset logic for picking an image](#srcset-logic-for-picking-an-image)
-8. [Choosing the right element](#choosing-the-right-image-element)
-9. [Other patterns](#other-patterns)
-10. [Best practices](#best-practices)
-11. [References](#references)
-
----
-
 ## `<img>` Element Attributes
 
 | Attribute       | Description                                                                 | Example Value / Usage                                                                                 | Pixel type        |
