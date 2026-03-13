@@ -9,28 +9,68 @@ How common CSS properties behave when different `display` values are applied. Be
 **Key:** ✅ property applies for this display type · ❌ property has no effect for this display type
 
 
-| CSS Property                                           | `none` | `contents`                     | `block`                          | `flow-root`                        | `inline`                    | `inline-block`         | `list-item`    | `inline list-item`          | `flex`                 | `inline-flex`                         | `grid`                 | `inline-grid`                         | `table`                  | `inline-table`         |
-| ------------------------------------------------------ | ------ | ------------------------------ | -------------------------------- | ---------------------------------- | --------------------------- | ---------------------- | -------------- | --------------------------- | ---------------------- | ------------------------------------- | ---------------------- | ------------------------------------- | ------------------------ | ---------------------- |
-| `**width`**                                            | N/A    | No box                         | ✅; default full width            | ✅ (like block)                     | ❌                           | ✅                      | ✅ (like block) | Content-based               | ✅                      | ✅ (like flex, container inline-sized) | ✅                      | ✅ (like grid, container inline-sized) | ✅ (table layout)         | ✅; flows inline        |
-| `**height**`                                           | N/A    | No box                         | ✅                                | ✅ (like block)                     | ❌                           | ✅                      | ✅ (like block) | ❌                           | ✅                      | ✅ (like flex)                         | ✅                      | ✅ (like grid)                         | ✅                        | ✅                      |
-| `**min/max-width**`                                    | N/A    | No box                         | ✅                                | ✅ (like block)                     | ❌                           | ✅                      | ✅ (like block) | ❌                           | ✅                      | ✅ (like flex)                         | ✅                      | ✅ (like grid)                         | ✅                        | ✅                      |
-| `**min/max-height**`                                   | N/A    | No box                         | ✅                                | ✅ (like block)                     | ❌                           | ✅                      | ✅ (like block) | ❌                           | ✅                      | ✅ (like flex)                         | ✅                      | ✅ (like grid)                         | ✅                        | ✅                      |
-| `**margin` (all)**                                     | N/A    | No box                         | ✅                                | ✅; BFC (no collapse with children) | Vertical ignored            | ✅                      | ✅ (like block) | Vertical ignored            | ✅                      | ✅ (like flex)                         | ✅                      | ✅ (like grid)                         | ✅                        | ✅                      |
-| `**margin: auto`**                                     | N/A    | No box                         | Horizontal center when width set | ✅ (like block)                     | ❌                           | Can center             | ✅ (like block) | ❌                           | Consumes space (flex)  | ✅ (like flex)                         | Consumes space in area | ✅ (like grid)                         | ✅                        | ✅                      |
-| `**padding` (all)**                                    | N/A    | No box (children not affected) | ✅                                | ✅ (like block)                     | Vertical = no layout impact | ✅                      | ✅ (like block) | Vertical = no layout impact | ✅                      | ✅ (like flex)                         | ✅                      | ✅ (like grid)                         | ✅                        | ✅                      |
-| `**vertical-align`**                                   | N/A    | N/A                            | ❌                                | ❌                                  | ✅ (baseline/line)           | ✅                      | ❌              | ✅                           | ❌                      | ❌                                     | ❌                      | ❌                                     | ✅ (cell alignment)       | ✅                      |
-| `**text-align**`                                       | N/A    | N/A                            | Aligns content inside            | ✅ (like block)                     | Parent controls             | Parent controls        | ✅ (like block) | Parent controls             | ❌ on layout            | ✅ (like flex)                         | ❌ on layout            | ✅ (like grid)                         | Cell content             | Cell content           |
-| `**line-height**`                                      | N/A    | N/A                            | Affects text inside              | ✅ (like block)                     | Affects line box            | Affects text/line box  | ✅ (like block) | Affects line box            | Affects text in items  | ✅ (like flex)                         | Affects text in areas  | ✅ (like grid)                         | Affects text in cells    | ✅ (like table)         |
-| `**top` / `right` / `bottom` / `left**`                | N/A    | No box                         | When position ≠ static           | ✅ (like block)                     | When position ≠ static      | When position ≠ static | ✅ (like block) | When position ≠ static      | When position ≠ static | ✅ (like flex)                         | When position ≠ static | ✅ (like grid)                         | When position ≠ static   | When position ≠ static |
-| `**float**`                                            | N/A    | N/A                            | ✅                                | ✅; contains floats (BFC)           | Converts to block           | ✅                      | ✅ (like block) | Converts to block           | ❌                      | ❌                                     | ❌                      | ❌                                     | ✅                        | ✅                      |
-| `**clear**`                                            | N/A    | N/A                            | ✅                                | ✅                                  | ❌                           | ✅                      | ✅ (like block) | ❌                           | ❌                      | ❌                                     | ❌                      | ❌                                     | ✅                        | ✅                      |
-| `**flex-***`                                           | N/A    | N/A                            | ❌                                | ❌                                  | ❌                           | ❌                      | ❌              | ❌                           | ✅ to flex items        | ✅ (like flex)                         | ❌                      | ❌                                     | ❌                        | ❌                      |
-| `**grid-***`                                           | N/A    | N/A                            | ❌                                | ❌                                  | ❌                           | ❌                      | ❌              | ❌                           | ❌                      | ❌                                     | ✅ to grid items        | ✅ (like grid)                         | ❌                        | ❌                      |
-| `**table-***` (e.g. `border-collapse`, `table-layout`) | N/A    | N/A                            | ❌                                | ❌                                  | ❌                           | ❌                      | ❌              | ❌                           | ❌                      | ❌                                     | ❌                      | ❌                                     | ✅                        | ✅                      |
-| `**list-style-***`                                     | N/A    | N/A                            | ❌                                | ❌                                  | ❌                           | ❌                      | ✅ (marker)     | ✅ (marker)                  | ❌                      | ❌                                     | ❌                      | ❌                                     | ❌                        | ❌                      |
-| `**gap**`                                              | N/A    | N/A                            | N/A                              | N/A                                | N/A                         | N/A                    | N/A            | N/A                         | ✅                      | ✅ (like flex)                         | ✅                      | ✅ (like grid)                         | N/A (use border-spacing) | N/A                    |
-| `**overflow**`                                         | N/A    | N/A                            | ✅                                | ✅; creates BFC                     | Can clip inline box         | ✅                      | ✅ (like block) | Can clip                    | ✅ to container         | ✅ (like flex)                         | ✅ to container         | ✅ (like grid)                         | ✅                        | ✅                      |
-| `**transform**`                                        | N/A    | N/A                            | ✅                                | ✅                                  | ✅                           | ✅                      | ✅              | ✅                           | ✅                      | ✅                                     | ✅                      | ✅                                     | ✅                        | ✅                      |
+<div class="table-scroll-wrapper">
+
+<style>
+.table-scroll-wrapper { overflow-x: auto; max-width: 100%; }
+.table-scroll-wrapper table { border-collapse: collapse; min-width: max-content; }
+.table-scroll-wrapper th,
+.table-scroll-wrapper td { border: 1px solid #ddd; padding: 0.4em 0.6em; text-align: left; white-space: nowrap; }
+.table-scroll-wrapper th:first-child,
+.table-scroll-wrapper td:first-child {
+  position: sticky; left: 0; z-index: 1;
+  background: var(--table-bg, #fff);
+  box-shadow: 2px 0 4px rgba(0,0,0,.06);
+}
+.table-scroll-wrapper th { background: #f5f5f5; }
+.table-scroll-wrapper th:first-child { background: #eee; }
+</style>
+
+<table>
+<thead>
+<tr>
+<th>CSS Property</th>
+<th><code>none</code></th>
+<th><code>contents</code></th>
+<th><code>block</code></th>
+<th><code>flow-root</code></th>
+<th><code>inline</code></th>
+<th><code>inline-block</code></th>
+<th><code>list-item</code></th>
+<th><code>inline list-item</code></th>
+<th><code>flex</code></th>
+<th><code>inline-flex</code></th>
+<th><code>grid</code></th>
+<th><code>inline-grid</code></th>
+<th><code>table</code></th>
+<th><code>inline-table</code></th>
+</tr>
+</thead>
+<tbody>
+<tr><td><strong>width</strong></td><td>N/A</td><td>No box</td><td>✅; default full width</td><td>✅ (like block)</td><td>❌</td><td>✅</td><td>✅ (like block)</td><td>Content-based</td><td>✅</td><td>✅ (like flex, container inline-sized)</td><td>✅</td><td>✅ (like grid, container inline-sized)</td><td>✅ (table layout)</td><td>✅; flows inline</td></tr>
+<tr><td><strong>height</strong></td><td>N/A</td><td>No box</td><td>✅</td><td>✅ (like block)</td><td>❌</td><td>✅</td><td>✅ (like block)</td><td>❌</td><td>✅</td><td>✅ (like flex)</td><td>✅</td><td>✅ (like grid)</td><td>✅</td><td>✅</td></tr>
+<tr><td><strong>min/max-width</strong></td><td>N/A</td><td>No box</td><td>✅</td><td>✅ (like block)</td><td>❌</td><td>✅</td><td>✅ (like block)</td><td>❌</td><td>✅</td><td>✅ (like flex)</td><td>✅</td><td>✅ (like grid)</td><td>✅</td><td>✅</td></tr>
+<tr><td><strong>min/max-height</strong></td><td>N/A</td><td>No box</td><td>✅</td><td>✅ (like block)</td><td>❌</td><td>✅</td><td>✅ (like block)</td><td>❌</td><td>✅</td><td>✅ (like flex)</td><td>✅</td><td>✅ (like grid)</td><td>✅</td><td>✅</td></tr>
+<tr><td><strong>margin (all)</strong></td><td>N/A</td><td>No box</td><td>✅</td><td>✅; BFC (no collapse with children)</td><td>Vertical ignored</td><td>✅</td><td>✅ (like block)</td><td>Vertical ignored</td><td>✅</td><td>✅ (like flex)</td><td>✅</td><td>✅ (like grid)</td><td>✅</td><td>✅</td></tr>
+<tr><td><strong>margin: auto</strong></td><td>N/A</td><td>No box</td><td>Horizontal center when width set</td><td>✅ (like block)</td><td>❌</td><td>Can center</td><td>✅ (like block)</td><td>❌</td><td>Consumes space (flex)</td><td>✅ (like flex)</td><td>Consumes space in area</td><td>✅ (like grid)</td><td>✅</td><td>✅</td></tr>
+<tr><td><strong>padding (all)</strong></td><td>N/A</td><td>No box (children not affected)</td><td>✅</td><td>✅ (like block)</td><td>Vertical = no layout impact</td><td>✅</td><td>✅ (like block)</td><td>Vertical = no layout impact</td><td>✅</td><td>✅ (like flex)</td><td>✅</td><td>✅ (like grid)</td><td>✅</td><td>✅</td></tr>
+<tr><td><strong>vertical-align</strong></td><td>N/A</td><td>N/A</td><td>❌</td><td>❌</td><td>✅ (baseline/line)</td><td>✅</td><td>❌</td><td>✅</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅ (cell alignment)</td><td>✅</td></tr>
+<tr><td><strong>text-align</strong></td><td>N/A</td><td>N/A</td><td>Aligns content inside</td><td>✅ (like block)</td><td>Parent controls</td><td>Parent controls</td><td>✅ (like block)</td><td>Parent controls</td><td>❌ on layout</td><td>✅ (like flex)</td><td>❌ on layout</td><td>✅ (like grid)</td><td>Cell content</td><td>Cell content</td></tr>
+<tr><td><strong>line-height</strong></td><td>N/A</td><td>N/A</td><td>Affects text inside</td><td>✅ (like block)</td><td>Affects line box</td><td>Affects text/line box</td><td>✅ (like block)</td><td>Affects line box</td><td>Affects text in items</td><td>✅ (like flex)</td><td>Affects text in areas</td><td>✅ (like grid)</td><td>Affects text in cells</td><td>✅ (like table)</td></tr>
+<tr><td><strong>top / right / bottom / left</strong></td><td>N/A</td><td>No box</td><td>When position ≠ static</td><td>✅ (like block)</td><td>When position ≠ static</td><td>When position ≠ static</td><td>✅ (like block)</td><td>When position ≠ static</td><td>When position ≠ static</td><td>✅ (like flex)</td><td>When position ≠ static</td><td>✅ (like grid)</td><td>When position ≠ static</td><td>When position ≠ static</td></tr>
+<tr><td><strong>float</strong></td><td>N/A</td><td>N/A</td><td>✅</td><td>✅; contains floats (BFC)</td><td>Converts to block</td><td>✅</td><td>✅ (like block)</td><td>Converts to block</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td></tr>
+<tr><td><strong>clear</strong></td><td>N/A</td><td>N/A</td><td>✅</td><td>✅</td><td>❌</td><td>✅</td><td>✅ (like block)</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td></tr>
+<tr><td><strong>flex-*</strong></td><td>N/A</td><td>N/A</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅ to flex items</td><td>✅ (like flex)</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td></tr>
+<tr><td><strong>grid-*</strong></td><td>N/A</td><td>N/A</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅ to grid items</td><td>✅ (like grid)</td><td>❌</td><td>❌</td></tr>
+<tr><td><strong>table-*</strong> (e.g. border-collapse, table-layout)</td><td>N/A</td><td>N/A</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅</td><td>✅</td></tr>
+<tr><td><strong>list-style-*</strong></td><td>N/A</td><td>N/A</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>✅ (marker)</td><td>✅ (marker)</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td><td>❌</td></tr>
+<tr><td><strong>gap</strong></td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td><td>N/A</td><td>✅</td><td>✅ (like flex)</td><td>✅</td><td>✅ (like grid)</td><td>N/A (use border-spacing)</td><td>N/A</td></tr>
+<tr><td><strong>overflow</strong></td><td>N/A</td><td>N/A</td><td>✅</td><td>✅; creates BFC</td><td>Can clip inline box</td><td>✅</td><td>✅ (like block)</td><td>Can clip</td><td>✅ to container</td><td>✅ (like flex)</td><td>✅ to container</td><td>✅ (like grid)</td><td>✅</td><td>✅</td></tr>
+<tr><td><strong>transform</strong></td><td>N/A</td><td>N/A</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr>
+</tbody>
+</table>
+
+</div>
 
 
 ## Notes
