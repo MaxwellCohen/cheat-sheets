@@ -11,51 +11,43 @@ Hooks let you reuse stateful logic in function components without classes. They 
 ## Built-in Hooks
 
 ```mermaid
-flowchart LR
-    subgraph Col1 [ ]
-        direction TB
-        subgraph State["State"]
-            useState
-            useReducer
-        end
-        subgraph Context["Context"]
-            useContext
-        end
-        subgraph Refs["Refs"]
-            useRef
-            useImperativeHandle
-        end
-        subgraph Effects["Effects"]
-            useEffect
-            useLayoutEffect
-            useInsertionEffect
-            useEffectEvent
-        end
-        subgraph Memo["Memoization"]
-            useMemo
-            useCallback
-        end
+flowchart TB
+    subgraph State["State"]
+        useState
+        useReducer
     end
-    subgraph Col2 [ ]
-        direction TB
-        subgraph Identity["Identity / SSR"]
-            useId
-        end
-        subgraph External["External store"]
-            useSyncExternalStore
-        end
-        subgraph Async["Transitions / async"]
-            useTransition
-            useDeferredValue
-            useOptimistic
-            useActionState
-        end
-        subgraph Data["Data"]
-            use
-        end
-        subgraph Debug["Debug"]
-            useDebugValue
-        end
+    subgraph Context["Context"]
+        useContext
+    end
+    subgraph Refs["Refs"]
+        useRef
+        useImperativeHandle
+    end
+    subgraph Effects["Effects"]
+        useEffect
+        useLayoutEffect
+        useInsertionEffect
+        useEffectEvent
+    end
+    subgraph Memo["Memoization"]
+        useMemo
+        useCallback
+    end
+    subgraph Async["Transitions / async"]
+        useTransition
+        useDeferredValue
+        useOptimistic
+        useActionState
+    end
+    subgraph Data["Data & identity"]
+        use
+        useId
+    end
+    subgraph External["External store"]
+        useSyncExternalStore
+    end
+    subgraph Debug["Debug"]
+        useDebugValue
     end
 ```
 
@@ -143,6 +135,8 @@ const value = useMemo(() => expensive(a, b), [a, b]);
 const onClick = useCallback(() => doSomething(id), [id]);
 ```
 
+> **Note:** The **React Compiler** can auto-memoize components and values, so in Compiler-enabled projects you may need `useMemo` / `useCallback` less often. Either way, **unstable references break memoization** — if dependencies (or props you pass to memoized children) are new object/array/function references every render, React will recompute or re-render anyway. Keep references stable (e.g. with `useMemo`/`useCallback` for values/functions created inside the component, or define constants outside the component).
+
 ### Identity / SSR
 
 
@@ -166,9 +160,10 @@ const onClick = useCallback(() => doSomething(id), [id]);
 | ------------------ | -------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | `useTransition`    | `useTransition()`                      | Returns `[isPending, startTransition]`; wrap non-urgent state updates in `startTransition` to keep UI responsive. |
 | `useDeferredValue` | `useDeferredValue(value)`              | Returns a deferred copy of `value` that can lag behind during heavy updates.                                      |
-| `useOptimistic`    | `useOptimistic(state, updateFn?)`      | Lets you show optimistic UI that reverts if the async action fails; use inside a transition/Action.                      |
-| `useActionState`   | `useActionState(action, initialState)` | Wraps an async action (e.g. form action) and provides pending state and the last result. Can be used as an async reducer: the action receives `(prevState, formData)` and returns the next state (or a promise of it). must be called inside a transition/Action |
+| `useOptimistic`    | `useOptimistic(state, updateFn?)`      | Lets you show optimistic UI that reverts if the async action fails. |
+| `useActionState`   | `useActionState(action, initialState)` | Wraps an async action (e.g. form action) and provides pending state and the last result. Can be used as an async reducer: the action receives `(prevState, formData)` and returns the next state (or a promise of it). |
 
+> **Note:** `useOptimistic` and `useActionState` are designed to be driven by a **transition** or an **action**. For `useOptimistic`, trigger the async work inside `startTransition` (or via a form/Server Action) so React can tie the optimistic update to that transition and revert it if the request fails. For `useActionState`, pass a function that is used as a form action or called inside `startTransition`; the hook’s pending state and result are tied to that action. Using them with arbitrary async code outside of a transition or action can lead to incorrect pending/optimistic behavior.
 
 See [Async React](async-react.md) for patterns with `useTransition`, `useOptimistic`, and form actions.
 
@@ -179,6 +174,7 @@ See [Async React](async-react.md) for patterns with `useTransition`, `useOptimis
 | ----- | -------------------------------- | -------------------------------------------------------------------------- |
 | `use` | `use(promise)` or `use(context)` | Reads a promise (with Suspense) or a context; can be called conditionally. **Note:** When used with a promise, the promise must be stable or cached between renders (e.g. via a cache wrapper) or React may re-suspend repeatedly. |
 
+**Promises and Suspense:** When you call `use(promise)` and the promise is still pending, React **throws that promise**. The nearest `<Suspense>` boundary catches it, shows its `fallback`, and re-renders the component once the promise resolves (or rejects; use an error boundary for rejections). When the promise has already resolved, `use` returns the value and does not throw. This “throw to suspend” pattern is how Suspense integrates with async data.
 
 ### Debug
 
