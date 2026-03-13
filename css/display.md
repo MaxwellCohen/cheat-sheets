@@ -85,24 +85,24 @@ flowchart TD
 
 ## Display Values at a Glance
 
-Summary of each `display` value: how the element participates in layout (external), how it lays out its children (internal), whether width/height and margin/padding apply, and when to use it.
+Summary of each `display` value: how the element participates in layout (external), how it lays out its children (internal), whether width/height and margin/padding apply, when to use it, and the matching Tailwind class.
 
-| Display Value      | External Layout               | Internal Layout | Width/Height | Margin/Padding  | Use Case                              |
-| ------------------ | ----------------------------- | --------------- | ------------ | --------------- | ------------------------------------- |
-| `none`             | Removed from flow             | N/A             | N/A          | N/A             | Hide elements completely              |
-| `contents`         | Removed (children take place) | N/A             | N/A          | N/A             | Grouping without wrapper              |
-| `inline`           | Flows with text               | Content-based   | No           | Horizontal only | Text-like elements                    |
-| `inline-block`     | Flows with text               | Content-based   | Yes          | Yes             | Inline with block features            |
-| `inline list-item` | Flows with text               | List + marker   | No           | Horizontal only | Inline list with marker               |
-| `inline-flex`      | Flows with text               | Flexbox         | Yes          | Yes             | Inline flex container                 |
-| `inline-grid`      | Flows with text               | Grid            | Yes          | Yes             | Inline grid container                 |
-| `inline-table`     | Flows with text               | Table layout    | Yes          | Yes             | Inline table                          |
-| `block`            | Full width, new line          | Content-based   | Yes          | Yes             | Structural elements                   |
-| `flow-root`        | Full width, new line          | Block (BFC)     | Yes          | Yes             | Containing floats, no margin collapse |
-| `list-item`        | Full width, new line          | List + marker   | Yes          | Yes             | Lists with markers                    |
-| `flex`             | Full width, new line          | Flexbox         | Yes          | Yes             | Flexible layouts                      |
-| `grid`             | Full width, new line          | Grid            | Yes          | Yes             | 2D grid layouts                       |
-| `table`            | Full width, new line          | Table layout    | Yes          | Yes             | Table layout, cell alignment          |
+| Display Value      | External Layout               | Internal Layout | Width/Height | Margin/Padding  | Use Case                              | Tailwind      |
+| ------------------ | ----------------------------- | --------------- | ------------ | --------------- | ------------------------------------- | ------------- |
+| `none`             | Removed from flow             | N/A             | N/A          | N/A             | Hide elements completely              | `hidden`      |
+| `contents`         | Removed (children take place) | N/A             | N/A          | N/A             | Grouping without wrapper              | `contents`    |
+| `inline`           | Flows with text               | Content-based   | No           | Horizontal only | Text-like elements                    | `inline`      |
+| `inline-block`     | Flows with text               | Content-based   | Yes          | Yes             | Inline with block features            | `inline-block`|
+| `inline list-item` | Flows with text               | List + marker   | No           | Horizontal only | Inline list with marker               | `[display:inline_list-item]` |
+| `inline-flex`      | Flows with text               | Flexbox         | Yes          | Yes             | Inline flex container                 | `inline-flex` |
+| `inline-grid`      | Flows with text               | Grid            | Yes          | Yes             | Inline grid container                 | `inline-grid` |
+| `inline-table`     | Flows with text               | Table layout    | Yes          | Yes             | Inline table                          | `inline-table`|
+| `block`            | Full width, new line          | Content-based   | Yes          | Yes             | Structural elements                   | `block`       |
+| `flow-root`        | Full width, new line          | Block (BFC)     | Yes          | Yes             | Containing floats, no margin collapse | `flow-root`   |
+| `list-item`        | Full width, new line          | List + marker   | Yes          | Yes             | Lists with markers                    | `list-item`   |
+| `flex`             | Full width, new line          | Flexbox         | Yes          | Yes             | Flexible layouts                      | `flex`        |
+| `grid`             | Full width, new line          | Grid            | Yes          | Yes             | 2D grid layouts                       | `grid`        |
+| `table`            | Full width, new line          | Table layout    | Yes          | Yes             | Table layout, cell alignment          | `table`       |
 
 
 ---
