@@ -231,6 +231,41 @@ function useDebounce<T>(value: T, delay: number): T {
 }
 ```
 
+**useInput** — Single controlled input (value + onChange + reset):
+
+```tsx
+function useInput(initialValue = '') {
+  const [value, setValue] = useState(initialValue);
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setValue(e.target.value);
+  }, []);
+  const reset = useCallback(() => setValue(initialValue), [initialValue]);
+  return { value, onChange: handleChange, setValue, reset };
+}
+
+// Usage:
+// const { value, onChange, reset } = useInput('');
+// <input value={value} onChange={onChange} />
+```
+
+**useInputs** — Multiple form fields by `name`:
+
+```tsx
+function useInputs<T extends Record<string, string>>(initialState: T) {
+  const [values, setValues] = useState<T>(initialState);
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setValues(prev => ({ ...prev, [name]: value }));
+  }, []);
+  const reset = useCallback(() => setValues(initialState), [initialState]);
+  return { values, handleChange, setValues, reset };
+}
+
+// Usage:
+// const { values, handleChange, reset } = useInputs({ email: '', password: '' });
+// <input name="email" value={values.email} onChange={handleChange} />
+```
+
 **usePrevious** — Previous render value:
 
 ```tsx
