@@ -2,16 +2,19 @@
 
 React offers several ways to load data: client-side with `useEffect` or libraries like React Query and SWR (caching, refetching), and server-side with async Server Components or Server/Client Components using the `use()` hook for streaming and Suspense. This guide compares these approaches and when to use each.
 
+**When to use which:** Simple one-off fetch → `useEffect`. Cached, refetchable client data → useQuery or SWR. Route-level data before render → framework loaders. Server-first, no loading UI → async Server Component. Server-first with streaming/Suspense → Server Component + `use()`. Client-side promises with Suspense → Client Component + `use()`. Explicit loading/success/error states, retry or refetch via events → XState.
+
 ## Quick comparison
 
 | Approach              | Where it runs | Best for                                  |
 |-----------------------|---------------|--------------------------------------------|
 | `useEffect`           | Client        | Simple one-off fetches                     |
 | useQuery / SWR        | Client        | Cached, refetchable client data            |
+| XState (machine + invoke) | Client   | Explicit loading/success/error, retry/refetch via events |
 | Router loaders        | Server / isomorphic | Route-level data before render (framework) |
 | Async Server Component | Server       | Server loading, no Suspense                |
 | Server Component + `use()` | Server → Client | Initial page data, streaming           |
-| `"use client"` + `use()` | Client       | Client-side promises + Suspense            |
+| Client Component + `use()` | Client       | Client-side promises + Suspense            |
 
 
 ## `useEffect`
@@ -70,7 +73,7 @@ function UserProfile({ userId }: { userId: string }) {
 
 ---
 
-## `useLibraries` (useQuery, SWR, etc)
+## Data-fetching libraries (useQuery, SWR)
 
 Libraries add caching, refetching, deduplication, and loading/error state. Prefer these over raw `useEffect` for most client-side data fetching.
 
@@ -128,6 +131,102 @@ function UserProfile({ userId }: { userId: string }) {
 - Extra dependency and bundle size.
 - Learning curve for query keys, invalidation, and options.
 - Overkill for very simple or one-off fetches.
+
+### XState
+
+Use a **state machine** with explicit `idle` → `loading` (invoke) → `success` or `error` states. The fetch runs in an **invoked actor** (`fromPromise`); context holds the result and error. Refetch or retry by sending an event (e.g. `REFETCH`). Fits well when you want clear, debuggable states or already use XState elsewhere. See [xstate.md](xstate.md) for machine basics, `invoke`, and `useMachine`.
+
+```mermaid
+flowchart LR
+  idle -->|FETCH| loading
+  loading -->|onDone| success
+  loading -->|onError| error
+  success -->|REFETCH| loading
+  error -->|REFETCH| loading
+```
+
+**Machine:** `idle` (initial; on `FETCH` → `loading`), `loading` (invoke `fetchUser` with `userId` from input; `onDone` → `success` + assign user; `onError` → `error` + assign error), `success` and `error` (on `REFETCH` → `loading`). Pass `userId` into the machine via **input** so one machine definition can be reused per user (e.g. `useMachine(machine, { input: { userId } })`).
+
+```tsx
+'use client';
+
+import { createMachine, assign, fromPromise } from 'xstate';
+import { useMachine } from '@xstate/react';
+
+const fetchUserMachine = createMachine({
+  id: 'fetchUser',
+  initial: 'idle',
+  context: ({ input }: { input: { userId: string } }) => ({
+    userId: input.userId,
+    user: null as User | null,
+    error: null as Error | null,
+  }),
+  states: {
+    idle: {
+      on: { FETCH: 'loading' },
+    },
+    loading: {
+      invoke: {
+        src: 'fetchUser',
+        input: ({ context }) => ({ id: context.userId }),
+        onDone: { target: 'success', actions: assign({ user: ({ event }) => event.output, error: null }) },
+        onError: { target: 'error', actions: assign({ error: ({ event }) => event.error }) },
+      },
+    },
+    success: {
+      on: { REFETCH: 'loading' },
+    },
+    error: {
+      on: { REFETCH: 'loading' },
+    },
+  },
+}).provide({
+  actors: {
+    fetchUser: fromPromise(async ({ input }: { input: { id: string } }) => {
+      const res = await fetch(`/api/users/${input.id}`);
+      if (!res.ok) throw new Error('Failed to fetch');
+      return res.json();
+    }),
+  },
+});
+
+function UserProfile({ userId }: { userId: string }) {
+  const [snapshot, send] = useMachine(fetchUserMachine, { input: { userId } });
+
+  if (snapshot.matches('idle')) {
+    return <button onClick={() => send({ type: 'FETCH' })}>Load user</button>;
+  }
+  if (snapshot.matches('loading')) return <Spinner />;
+  if (snapshot.matches('error')) {
+    return (
+      <>
+        <Error message={snapshot.context.error?.message ?? 'Unknown error'} />
+        <button onClick={() => send({ type: 'REFETCH' })}>Retry</button>
+      </>
+    );
+  }
+  const user = snapshot.context.user;
+  if (!user) return null;
+  return (
+    <div>
+      {user.name}
+      <button onClick={() => send({ type: 'REFETCH' })}>Refetch</button>
+    </div>
+  );
+}
+```
+
+To start loading immediately (e.g. on mount), set `initial: 'loading'` and trigger the invoke from a top-level transition, or send `FETCH` in an `entry` action on a parent state. The example above uses `idle` so the user clicks to load.
+
+**Advantages**
+- Explicit states (idle, loading, success, error) are easy to reason about and debug; state charts and DevTools visualize the flow.
+- Retry and refetch are just events; no ad-hoc loading flags.
+- Fits apps that already use XState; same patterns for forms, wizards, and async flows.
+- Input (e.g. `userId`) can be passed via `useMachine(machine, { input: { userId } })`, so one machine is reusable per resource.
+
+**Disadvantages**
+- More boilerplate than useQuery/SWR; no built-in caching or request deduplication (you can layer a cache outside the machine if needed).
+- Learning curve for machines, invoke, and `assign` if the team doesn't use XState yet.
 
 ---
 
@@ -216,6 +315,45 @@ export default function PostPage() {
 
 React Router also supports **clientLoader** for client-only loading. Loader data is stable and safe to use in dependency arrays.
 
+### Redwood — Cells
+
+Redwood doesn’t use route loaders; it uses **Cells**, a component-level pattern. You put a Cell on the page and export a GraphQL `QUERY` plus `Success` (required), and optionally `Loading`, `Empty`, and `Failure`. The Cell runs the query and renders the right state. Route params are passed as props from the page to the Cell (e.g. for `$id` in the query).
+
+```tsx
+// PostCell.tsx
+import type { PostQuery, PostQueryVariables } from 'types/graphql';
+import type { CellSuccessProps, CellFailureProps } from '@redwoodjs/web';
+
+export const QUERY = gql`
+  query PostQuery($id: String!) {
+    post(id: $id) {
+      id
+      title
+      body
+    }
+  }
+`;
+
+export const Loading = () => <div>Loading…</div>;
+export const Failure = ({ error }: CellFailureProps) => <div>Error: {error.message}</div>;
+export const Success = ({ post }: CellSuccessProps<PostQuery>) => (
+  <article>
+    <h1>{post.title}</h1>
+    <p>{post.body}</p>
+  </article>
+);
+```
+
+```tsx
+// PostPage.tsx — route receives params, passes to Cell
+import PostCell from 'src/components/PostCell/PostCell';
+
+const PostPage = ({ id }: { id: string }) => <PostCell id={id} />;
+export default PostPage;
+```
+
+Cells use `beforeQuery` (and `afterQuery`) to map props to query variables. Data runs client-side via the app’s GraphQL API unless you use prerender.
+
 **Summary**
 
 | Framework           | API                     | Where it runs        |
@@ -223,14 +361,15 @@ React Router also supports **clientLoader** for client-only loading. Loader data
 | TanStack Start      | `loader`, `beforeLoad`  | Server then client   |
 | Next.js Pages       | `getServerSideProps`    | Server only          |
 | React Router        | `loader`, `clientLoader`| Server or client     |
+| Redwood             | Cells (`QUERY`, `Success`, `Loading`/`Failure`/`Empty`) | Client (GraphQL)     |
 
 ---
 
-## "use server" (async Server Component)
+## Async Server Component
 
 Loading data on the server with no Suspense and no client-side data loading: use a React component that is an **async function**. It runs on the server, `await`s data directly, and renders. No loading state or Suspense needed for that component’s data.
 
-In frameworks like Next.js App Router, components in the server tree can be async; you don’t put `"use server"` on the component (that directive is for Server **Actions**). The component runs on the server by default.
+In frameworks like Next.js App Router, components in the server tree can be async. You don’t put `"use server"` on the component—that directive is for Server **Actions**, not for making a component run on the server. The component runs on the server by default.
 
 ```tsx
 // Server Component (e.g. app/post/[id]/page.tsx) — async function, runs on server
@@ -268,7 +407,7 @@ async function getPost(id: string) {
 
 ---
 
-## "use server" and `use`
+## Server Component + `use()`
 
 Server Components can `await` async work directly. Pass the resulting **promise** to a child that uses the `use()` hook so the child can unwrap it and Suspense can show a fallback.
 
@@ -315,7 +454,7 @@ function PostContent({ postPromise }: { postPromise: Promise<Post> }) {
 
 ---
 
-## "use client" and `use`
+## Client Component + `use()`
 
 In a Client Component, `use(promise)` lets you read a promise that was passed as a prop or created in the same tree. Wrap the component in `<Suspense>` so React can show a fallback while the promise is pending.
 
@@ -380,7 +519,6 @@ The custom `cache()` above deduplicates by arguments so the same `userId` return
 - Error handling must be done in an Error Boundary or inside the promise (e.g. try/catch in the fetcher); rejected promises don’t surface to the component.
 - Cache is in-memory only; no persistence across full page reloads.
 - Less ecosystem support than useQuery/SWR (no built-in refetch on interval, focus, or invalidation helpers).
-
 
 ---
 

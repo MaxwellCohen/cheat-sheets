@@ -2,6 +2,8 @@
 
 Definitions of React-specific terms and phrases, drawn from the [React documentation](https://react.dev) (including [react.dev/llms.txt](https://react.dev/llms.txt) and linked docs).
 
+**See also:** [hooks.md](hooks.md) (hook reference), [react-concepts.md](react-concepts.md) (concept map), [async-react.md](async-react.md) (async patterns), [data-fetching-react.md](data-fetching-react.md) (data fetching).
+
 ---
 
 ## A
@@ -32,6 +34,8 @@ Definitions of React-specific terms and phrases, drawn from the [React documenta
 
 **Conditional rendering** — Showing different JSX based on conditions. Use JavaScript `if`, the ternary operator `cond ? a : b`, or `cond && jsx` inside your component. [Conditional Rendering](https://react.dev/learn/conditional-rendering)
 
+**Controlled component** — A form input (or similar) whose value is driven by React **state** and updated via an **event handler** (e.g. `value={name}` and `onChange`). The single source of truth lives in the component. Contrast **uncontrolled component**. [Reacting to Input with State](https://react.dev/learn/reacting-to-input-with-state)
+
 **Context Provider** — A component that wraps children and supplies the value for a context. Any descendant can read that value via `useContext()`. [Passing Data Deeply with Context](https://react.dev/learn/passing-data-deeply-with-context)
 
 **createContext** — React API to create a new context. You pass a default value; components that are not inside a provider get this value from `useContext()`. [createContext](https://react.dev/reference/react/createContext)
@@ -51,6 +55,8 @@ Definitions of React-specific terms and phrases, drawn from the [React documenta
 ---
 
 ## E
+
+**Error Boundary** — A **component** that catches JavaScript errors in its child tree and shows a fallback UI instead of crashing. Implemented as a class component with `getDerivedStateFromError` and/or `componentDidCatch`; there is no function-component equivalent yet. Use to isolate failures (e.g. one route or widget). [Component](https://react.dev/reference/react/Component), [error-boundaries](https://react.dev/reference/eslint-plugin-react-hooks/lints/error-boundaries)
 
 **Effect** — In React docs, a side effect that is caused by **rendering** (e.g. connecting to a server when a component appears), not by a specific event. Declared with `useEffect`. Runs after **commit** so you can sync with external systems (network, DOM, third-party libs). [Synchronizing with Effects](https://react.dev/learn/synchronizing-with-effects)
 
@@ -72,6 +78,8 @@ Definitions of React-specific terms and phrases, drawn from the [React documenta
 
 **flushSync** — A React DOM API that forces React to flush updates to the DOM synchronously inside the callback. Rare; use when you need to read the DOM immediately after a state update (e.g. scroll to a newly added list item). [flushSync](https://react.dev/reference/react-dom/flushSync), [Manipulating the DOM with Refs](https://react.dev/learn/manipulating-the-dom-with-refs)
 
+**forwardRef** — A React API that wraps a component so it can receive a `ref` from the parent and pass it to a child DOM node (or expose a custom handle via **useImperativeHandle**). Use when you need to access the underlying DOM element or customize what the parent sees when it uses a ref. [forwardRef](https://react.dev/reference/react/forwardRef)
+
 **Fragment** — `<>...</>` or `<Fragment>`. Lets you group JSX children without adding an extra DOM node. Use `<Fragment key={...}>` when you need a key (e.g. in a list). [Fragment](https://react.dev/reference/react/Fragment)
 
 ---
@@ -79,6 +87,10 @@ Definitions of React-specific terms and phrases, drawn from the [React documenta
 ## H
 
 **Hook** — A function whose name starts with `use` (e.g. `useState`, `useEffect`). Hooks let you use React features (state, context, effects, etc.) from function components and custom Hooks. They can only be called at the top level of a component or custom Hook (not in conditions, loops, or nested functions). [State: A Component's Memory](https://react.dev/learn/state-a-components-memory), [Rules of Hooks](https://react.dev/reference/rules/rules-of-hooks)
+
+**Hydration** — The process of attaching React to server-rendered HTML so the page becomes interactive. React “hydrates” the existing DOM instead of creating it from scratch. Use **hydrateRoot** (not `createRoot`) when the container already has server-rendered markup. [hydrateRoot](https://react.dev/reference/react-dom/client/hydrateRoot)
+
+**hydrateRoot** — React DOM API for hydrating a container that already has server-rendered HTML. Call `hydrateRoot(domNode, reactNode)` so React attaches event listeners and makes the tree interactive. Use instead of **createRoot** for server-rendered apps. [hydrateRoot](https://react.dev/reference/react-dom/client/hydrateRoot)
 
 ---
 
@@ -95,6 +107,8 @@ Definitions of React-specific terms and phrases, drawn from the [React documenta
 ---
 
 ## L
+
+**lazy** — A React API that defers loading a component’s code until it is rendered. Use with **Suspense** to show a fallback while the component bundle loads. Enables code-splitting and smaller initial bundles. [lazy](https://react.dev/reference/react/lazy)
 
 **Lifting state up** — Moving state from a child component into a shared parent so multiple children can read and update the same state. The parent passes the value and updater (e.g. setter or dispatch) down as props. [Sharing State Between Components](https://react.dev/learn/sharing-state-between-components)
 
@@ -120,6 +134,8 @@ Definitions of React-specific terms and phrases, drawn from the [React documenta
 
 ## P
 
+**Profiler** — A built-in React component that measures how often part of the tree re-renders and how long renders take. Wrap a subtree with `<Profiler id="..." onRender={callback}>` to gather timing and commit information. Development and profiling builds only. [Profiler](https://react.dev/reference/react/Profiler)
+
 **Prop drilling** — Passing props through many layers of components that don’t use them, only to reach a deep child. Context is one way to avoid prop drilling. [Passing Data Deeply with Context](https://react.dev/learn/passing-data-deeply-with-context)
 
 **Props** — Inputs to a component, passed like HTML attributes in JSX. React components receive a single `props` object (often destructured). Props are **immutable**: a component cannot change its own props; the parent must pass new props. [Passing Props to a Component](https://react.dev/learn/passing-props-to-a-component)
@@ -133,6 +149,8 @@ Definitions of React-specific terms and phrases, drawn from the [React documenta
 ---
 
 ## R
+
+**Resource** — In the React docs, a value that **use** can read: either a **context** or a Promise. When the value is a Promise, the component **suspends** until it resolves; use with **Suspense**. [use](https://react.dev/reference/react/use)
 
 **React node** — What you can pass to `root.render()`: a piece of JSX, the result of `createElement()`, a string, a number, `null`, or `undefined`. [createRoot](https://react.dev/reference/react-dom/client/createRoot)
 
@@ -156,13 +174,15 @@ Definitions of React-specific terms and phrases, drawn from the [React documenta
 
 **Render** — When React calls your component functions to compute what should be on screen. Rendering should be a **pure** calculation (same inputs → same output). The result is then **committed** to the DOM. [Render and Commit](https://react.dev/learn/render-and-commit)
 
-**Re-render** — When React runs a component again, e.g. because its state or a parent’s state changed, or because a parent re-rendered. React may skip re-rendering a component if it detects the output is unchanged.
+**Re-render** — When React runs a component again, e.g. because its state or a parent’s state changed, or because a parent re-rendered. React may skip re-rendering a component if it detects the output is unchanged (e.g. with `memo` or React Compiler).
 
 **Rules of Hooks** — (1) Call Hooks only at the **top level** of a function component or custom Hook (not in conditions, loops, or after early returns). (2) Call Hooks only from React function components or from custom Hooks. Breaking these rules can cause bugs. [Rules of Hooks](https://react.dev/reference/rules/rules-of-hooks)
 
 ---
 
 ## S
+
+**Server Action** — An async function marked with `'use server'` that runs on the server and can be invoked from **Client Components** (e.g. as a form action or in an event handler). Used for mutations, form submissions, and server-side logic without a separate API route. [Server Functions](https://react.dev/reference/rsc/server-functions), ['use server'](https://react.dev/reference/rsc/use-server)
 
 **Server Component** — A component that runs on the server (or at build time) before bundling. It is not sent to the client, so it cannot use `useState` or other client-only APIs. Used for data fetching and rendering static or server-driven content; interactivity is added by composing with **Client Components**. [Server Components](https://react.dev/reference/rsc/server-components)
 
@@ -192,11 +212,13 @@ Definitions of React-specific terms and phrases, drawn from the [React documenta
 
 ## U
 
+**Uncontrolled component** — A form input (or similar) whose value is stored in the DOM rather than in React **state**; you read it via a **ref** (e.g. `ref.current.value`). Use for simple forms or when integrating with non-React code. Contrast **controlled component**. [Reacting to Input with State](https://react.dev/learn/reacting-to-input-with-state)
+
 **Unmount** — When a component is removed from the screen. React runs the **cleanup** of any Effects when a component unmounts.
 
 **Updater function** — A function you pass to the state setter, e.g. `setNumber(n => n + 1)`. React queues it and, on the next render, calls it with the previous state and uses the return value as the new state. Use when you need to update state multiple times in one event or when the next state depends on the previous one. Must be pure. [Queueing a Series of State Updates](https://react.dev/learn/queueing-a-series-of-state-updates)
 
-**use** — A React API that reads a **resource** (a Promise or a **context**). When called with a Promise, the component **suspends** until the Promise resolves; use with **Suspense** and Error Boundaries. Unlike Hooks, `use` can be called inside conditionals and loops. [use](https://react.dev/reference/react/use)
+**use** — A React API that reads a **resource**: either a Promise or a **context**. When called with a Promise, the component **suspends** until the Promise resolves; use with **Suspense** and Error Boundaries. Unlike Hooks, `use` can be called inside conditionals and loops. [use](https://react.dev/reference/react/use)
 
 **useActionState** — A Hook that updates state based on the result of a **form action**. You pass an action function and initial state; it returns `[state, formAction, isPending]`. The returned action is passed to `<form action={...}>` or a button’s `formAction`. With Server Components, form state can be shown before hydration. Formerly `useFormState` in React DOM. [useActionState](https://react.dev/reference/react/useActionState)
 
@@ -217,6 +239,8 @@ Definitions of React-specific terms and phrases, drawn from the [React documenta
 **useId** — A Hook that generates a unique ID string stable across server and client. Use for accessibility attributes (e.g. `aria-describedby`, `id`/`htmlFor` pairs). Do not use for list **keys** or cache keys. [useId](https://react.dev/reference/react/useId)
 
 **useImperativeHandle** — A Hook that customizes what a parent sees when it uses a ref on your component. You expose a limited API (e.g. only `focus()`) instead of the full DOM node. Used with `forwardRef`. [useImperativeHandle](https://react.dev/reference/react/useImperativeHandle), [Manipulating the DOM with Refs](https://react.dev/learn/manipulating-the-dom-with-refs)
+
+**useInsertionEffect** — A version of **useEffect** that runs before DOM mutations (before layout effects). Use for CSS-in-JS libraries that inject styles so they exist before layout runs. Cleanup runs in reverse order. Prefer `useEffect` when you don’t need to run before layout. [useInsertionEffect](https://react.dev/reference/react/useInsertionEffect)
 
 **useLayoutEffect** — A version of `useEffect` that runs synchronously after all DOM mutations but before the browser repaints. Use when you need to measure the DOM or update it before paint (e.g. positioning a tooltip). Prefer `useEffect` when possible, since `useLayoutEffect` blocks painting. [useLayoutEffect](https://react.dev/reference/react/useLayoutEffect)
 

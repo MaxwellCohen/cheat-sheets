@@ -1,4 +1,8 @@
-# React Concepts 
+# React Concepts
+
+High-level map of React concepts: debugging, optimizations, escape hatches, sync state, data loading, and async patterns. Use this to see how APIs fit together; for hook details and async flows see the links below.
+
+**See also:** [hooks.md](hooks.md) (hook reference), [async-react.md](async-react.md) (async patterns).
 
 ```mermaid
 flowchart TD
@@ -7,14 +11,16 @@ flowchart TD
         direction TB
         useDebugValue["useDebugValue - better debugging in dev tools"]
         Profiler["&lt;Profiler&gt; - measure render cost"]
+        StrictMode["&lt;StrictMode&gt; - dev checks"]
     end
 
     subgraph Optimizations["⚡ Optimizations"]
         direction TB
         useMemo["useMemo - memoize values"]
         useCallback["useCallback - stable refs"]
+        memo["memo - skip re-render when props same"]
         reactCompiler["react compiler - runtime optimize"]
-        Activity["&lt;Activity&gt; - delay render"]
+        Activity["&lt;Activity&gt; - defer updates when hidden"]
         Fragment["&lt;Fragment&gt; - group subparts"]
     end
 
@@ -29,16 +35,24 @@ flowchart TD
         useId["useId - stable id SSR/client"]
     end
 
-    %% Profiler -->|measures| useMemo
-    %% Profiler -->|measures| useCallback
-    %% useEffectEvent -->|used inside| useEffect
-    %% useImperativeHandle -->|wraps| useRef
-    %% useMemo -->|returns stable ref like| useRef
+    Profiler -->|measures| useMemo
+    Profiler -->|measures| useCallback
+    Profiler -->|measures| memo
+    useEffectEvent -->|used inside| useEffect
+    useImperativeHandle -->|wraps| useRef
+    useCallback -->|stable fn for| memo
 ```
 
 ```mermaid
 flowchart LR
     %% Sync State, Data loading, Async React
+
+    subgraph DataLoading["📥 Data loading"]
+        direction LR
+        Suspense["&lt;Suspense&gt; - wait for data"]
+        lazy["lazy - defer component code"]
+        use["use - promises and context"]
+    end
 
     subgraph SyncState["🔄 Sync State"]
         direction LR
@@ -49,11 +63,7 @@ flowchart LR
         useSyncExternalStore["useSyncExternalStore - external store"]
     end
 
-    subgraph DataLoading["📥 Data loading"]
-        direction LR
-        Suspense["&lt;Suspense&gt; - wait for data"]
-        use["use - promises and context"]
-    end
+
 
     subgraph AsyncReact["⏳ Async React"]
         direction LR
@@ -78,7 +88,8 @@ flowchart LR
     useContext -->|same source as| use
     use -->|loaded value into| useState
 
-    %% Data loading ↔ Async React
+    %% Data loading internal
+    Suspense -->|boundary for| lazy
     Suspense -->|boundary for| use
     use -->|unwraps promises from| formAction
     useTransition -->|wraps| startTransition
@@ -87,11 +98,3 @@ flowchart LR
     useDeferredValue -->|pairs with| useTransition
     ViewTransition -->|animates| useTransition
 ```
-
-
-
-
-
-
-
-

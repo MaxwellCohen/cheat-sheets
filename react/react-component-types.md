@@ -2,17 +2,21 @@
 
 ## Summary
 
-Next.js App Router introduces a new paradigm for React components, distinguishing between **Server Components** and **Client Components**. By default, all components in the App Router are Server Components, which run on the server and can directly access backend resources. Client Components (marked with `'use client'`) run in the browser and enable interactivity. Additionally, Server Components can be async to fetch data directly, and Server Actions (marked with `'use server'`) allow client components to invoke server-side functions.
+Next.js App Router introduces a new paradigm for React components, distinguishing between **Server Components** and **Client Components**. By default, all components in the App Router are Server Components, which run on the server and can directly access backend resources. Client Components (marked with `'use client'`) run in the browser and enable interactivity. Server Components can be async to fetch data directly. **Server Actions** (marked with `'use server'`) are server-side **functions** (not components) that Client Components can call—e.g. for form submissions and mutations.
+
+**See also:** [react-concepts.md](react-concepts.md), [hooks.md](hooks.md), [data-fetching-react.md](data-fetching-react.md), [async-react.md](async-react.md).
 
 ## Component Types Comparison
 
-| Component Type | Directive | code executes | Can Use Hooks | Can Be Async | Data Fetching | Interactivity | Use Case |
-|----------------|-----------|---------------|---------------|--------------|---------------|---------------|----------|
-| **Class Component** | 'use client' | client and server | ❌ | ❌ | Lifecycle methods | ✅ | Error boundaries |
+| Component Type | Directive | Runs on | Can Use Hooks | Can Be Async | Data Fetching | Interactivity | Use Case |
+|----------------|-----------|---------|---------------|--------------|---------------|---------------|----------|
+| **Class Component** | `'use client'` | Client (and server during SSR) | ❌ | ❌ | Lifecycle methods | ✅ | Error boundaries |
 | **Functional Component (Server)** | None (default) | Server | ❌ | ✅ | Direct fetch/DB | ❌ | Static content, data fetching |
-| **Client Component** | `'use client'` | client and server | ✅ | ❌ | useEffect/fetch | ✅ | Interactive UI, state management |
+| **Client Component** | `'use client'` | Client (and server during SSR) | ✅ | ❌ | useEffect/fetch | ✅ | Interactive UI, state management |
 | **Async Server Component** | None (default) | Server | ❌ | ✅ | Direct fetch/DB | ❌ | Server-side data fetching |
 | **Server Action** | `'use server'` | Server | ❌ | ✅ | Direct fetch/DB | ❌ | Form submissions, mutations |
+
+*Server Actions are **functions**, not components; they run on the server when invoked from the client.*
 
 ## Class Components
 
@@ -24,7 +28,7 @@ Class components are not commonly used in modern React development. Their main u
 - Access props via `this.props`
 - Manage state via `this.state`
 - Cannot be async
-- Always run on the client
+- Run on the client (and on the server during SSR/hydration when used in the App Router; they are effectively client components and require `'use client'`)
 
 ### Example: Error Boundary
 
@@ -69,6 +73,10 @@ In Next.js App Router, **all components are Server Components by default**. They
 - Smaller bundle size (code sent to browsers is JSON representation of the component)
 - Can be async
 
+### When to Use Server Components
+- Static or server-rendered content, layout, and structure
+- Any server-only rendering that doesn’t need async data in this component
+
 ### Example
 
 ```tsx
@@ -77,7 +85,7 @@ import { db } from '@/lib/db';
 
 export default function UserProfile({ userId }: { userId: string }) {
   // Direct database access - no API route needed!
-  const user = db.users.find(userId);
+  const user = db.users.findById(userId); // or findUnique({ where: { id: userId } })
   
   return (
     <div>
@@ -90,7 +98,7 @@ export default function UserProfile({ userId }: { userId: string }) {
 
 ## Client Components
 
-Client Components are marked with the `'use client'` directive and run in the browser. They enable interactivity, state management, and access to browser APIs.
+Client Components are marked with the `'use client'` directive and run in the browser. They enable interactivity, state management, and access to browser APIs. The first `'use client'` in an import chain makes that module and all its dependencies part of the client bundle.
 
 ### Characteristics
 - Must have `'use client'` directive at the top
@@ -99,7 +107,7 @@ Client Components are marked with the `'use client'` directive and run in the br
 - Can use all React hooks
 - Can use browser APIs (`window`, `localStorage`, etc.) with proper safeguards
 - Cannot be async
-- Can import and use Server Components (but not the other way around)
+- Can receive and render Server Components when they are passed as `children` or other props from a Server Component parent (Client Components cannot import Server Components)
 - Larger bundle size (code sent to client)
 
 ### Example
@@ -141,7 +149,9 @@ Async Server Components are Server Components that can be declared as `async` an
 - Cannot use hooks
 - Automatically handle loading states with Suspense
 
-### Example
+### Example (Suspense with async child)
+
+Suspense shows the fallback while the **async child** component is loading. The child’s async render is what triggers suspension.
 
 ```tsx
 // app/users/page.tsx
@@ -154,23 +164,33 @@ async function getUsers() {
   return res.json();
 }
 
-export default async function UsersPage() {
+async function UserList() {
   const users = await getUsers();
-  
+  return (
+    <ul>
+      {users.map(user => (
+        <li key={user.id}>{user.name}</li>
+      ))}
+    </ul>
+  );
+}
+
+export default function UsersPage() {
   return (
     <div>
       <h1>Users</h1>
       <Suspense fallback={<div>Loading...</div>}>
-        <ul>
-          {users.map(user => (
-            <li key={user.id}>{user.name}</li>
-          ))}
-        </ul>
+        <UserList />
       </Suspense>
     </div>
   );
 }
 ```
+
+### When to Use Async Server Components
+- Route or section-level data that must be loaded before render
+- Server-side data fetching without a separate API route
+- When you want streaming: put the fetch in an async child and wrap it with Suspense (see [data-fetching-react.md](data-fetching-react.md), [async-react.md](async-react.md))
 
 ### Data Fetching Patterns
 
@@ -198,7 +218,7 @@ async function getCachedData() {
 
 ## Server Actions
 
-Server Actions are functions marked with `'use server'` that can be called from Client Components. They run on the server and are perfect for form submissions, mutations, and server-side operations.
+Server Actions are **functions** marked with `'use server'` that can be called from Client Components. They run on the server and are perfect for form submissions, mutations, and server-side operations. Forms using `<form action={serverAction}>` work without JavaScript (progressive enhancement).
 
 ### Characteristics
 - Must have `'use server'` directive
@@ -211,13 +231,17 @@ Server Actions are functions marked with `'use server'` that can be called from 
 
 ### Example: Inline Server Action
 
+`useActionState` returns `[state, formAction, isPending]`. Use it when you need pending state or the action’s return value.
+
 ```tsx
 // app/components/AddUser.tsx
 'use client';
 
 import { useActionState } from 'react';
 
-async function addUser(prevState: any, formData: FormData) {
+type AddUserState = { success?: boolean; message?: string } | null;
+
+async function addUser(prevState: AddUserState, formData: FormData) {
   'use server';
   
   const name = formData.get('name') as string;
@@ -228,12 +252,14 @@ async function addUser(prevState: any, formData: FormData) {
 }
 
 export default function AddUser() {
-  const [state, formAction] = useActionState(addUser, null);
+  const [state, formAction, isPending] = useActionState(addUser, null);
 
   return (
     <form action={formAction}>
       <input name="name" type="text" />
-      <button type="submit">Add User</button>
+      <button type="submit" disabled={isPending}>
+        {isPending ? 'Adding...' : 'Add User'}
+      </button>
       {state?.message && <p>{state.message}</p>}
     </form>
   );
@@ -280,13 +306,15 @@ export default function UserForm() {
 }
 ```
 
+For pending state or displaying the action’s return value (e.g. errors), use `useActionState(createUser, null)` instead of `action={createUser}` and pass the returned `formAction` to `action`. See [async-react.md](async-react.md).
+
 ## Component Composition Rules
 
 ### ✅ Allowed
 - Server Components can import and render other Server Components
 - Client Components can import and render other Client Components
-- Client Components can import and render Server Components (as children/props)
-- Server Components can pass Server Components as props to Client Components
+- Client Components can receive and render Server Components as `children` or other props when a **Server Component parent** passes them (Client Components cannot import Server Components)
+- Server Components can pass Server Components as props (e.g. `children`) to Client Components
 
 ### ❌ Not Allowed
 - Server Components cannot import Client Components directly
@@ -321,10 +349,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
 2. **Keep Client Components Small**: Move logic to Server Components when possible to reduce bundle size.
 
-3. **Use Async Server Components for Data Fetching**: Prefer async Server Components over `useEffect` + fetch in Client Components.
+3. **Compose Server + Client by passing children**: When you need both, have a Server Component pass Server Components as `children` (or other props) into a Client Component—don’t import Server Components from Client Component files. See the composition example above.
 
-4. **Use Server Actions for Mutations**: Use Server Actions for form submissions and data mutations instead of API routes.
+4. **Use Async Server Components for Data Fetching**: Prefer async Server Components over `useEffect` + fetch in Client Components.
 
-5. **Leverage Suspense**: Use Suspense boundaries with async Server Components for better loading states.
+5. **Use Server Actions for Mutations**: Use Server Actions for form submissions and data mutations instead of API routes.
 
-6. **Error Boundaries**: Use Class Components only for Error Boundaries when needed.
+6. **Leverage Suspense**: Use Suspense boundaries with async child Server Components for streaming and loading states.
+
+7. **Error Boundaries**: Use Class Components only for Error Boundaries when needed.

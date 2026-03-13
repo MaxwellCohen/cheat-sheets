@@ -1,6 +1,6 @@
 # Async React
 
-Async React is a set of new features to help with providing performant user experiences by enabling concurrent rendering, streaming, and better data fetching patterns.
+This doc targets **React 19** (useActionState, useOptimistic, async transition behavior). Async React is a set of features to help with performant user experiences by enabling concurrent rendering, streaming, and better data fetching patterns.
 
 ```mermaid
 
@@ -17,29 +17,41 @@ I --> J["`Transition completed`"]
 J --> K["`Data rendered`"]
 ```
 
+
+
 ## Key Concepts
 
 ### Suspense Component
+
 - Declarative way to handle loading states
 - Shows fallback UI while data loads
 - Works with both client and server components
 
 ### useTransition Hook
+
 - Marks state updates as non-urgent transitions
 - Returns `[isPending, startTransition]`
 - Keeps UI responsive during updates
 
 ### useOptimistic Hook
+
 - Shows optimistic UI updates before server confirms the action
-- Returns `[optimisticState, addOptimisticUpdate]`
+- Returns `[optimisticState, setOptimistic]` (often named e.g. `addOptimistic` when adding items)
+- Optional second argument: reducer `(state, optimisticValue) => newState`; the setter can also accept an updater function like `useState`
 - Automatically reverts if the action fails
 - Perfect for instant feedback on user actions like likes, comments, form submissions
 - Must be called within a transition (useTransition or useActionState)
 
+### useDeferredValue Hook
+
+- `useDeferredValue(value)` returns a deferred copy of `value` that can lag behind during heavy updates
+- Use to keep input snappy while a heavy list or filter updates, or to show stale content until new content loads (e.g. with Suspense)
+- See [hooks.md](hooks.md) and [react-concepts.md](react-concepts.md) for the hook table and diagram
+
 ## Full Item Loading
 
-1) Create a loading function that returns a promise. 
-2) Wrap the function in a caching function (like the one below) because React requires a stable promise between reloads or you will have lots of pain with multiple requests and rerenders
+1. Create a loading function that returns a promise. 
+2. Wrap the function in a caching function (like the one below) because React requires a stable promise between reloads or you will have lots of pain with multiple requests and rerenders. The example below has no invalidation (no TTL or cache busting)—suitable when "same args = same request"; real apps may add TTL or invalidation.
 
 ```ts
 const cacheFn = <Fn extends (...args: never[]) => unknown>(fn: Fn) => {
@@ -61,7 +73,7 @@ const cacheFn = <Fn extends (...args: never[]) => unknown>(fn: Fn) => {
 
 ```
 
-3) In the parent component, use Suspense to handle loading:
+1. In the parent component, use Suspense to handle loading:
 
 ```tsx
 // Parent component
@@ -80,13 +92,13 @@ async function ItemDetails({ id }: { id: number }) {
 }
 ```
 
-4) For client-side data fetching with Suspense:
+1. For client-side data fetching with Suspense:
 
 ```tsx
 import { use, Suspense } from 'react';
 
 function ItemDetails({ itemPromise }: { itemPromise: Promise<Item> }) {
-  const item = use(itemPromise); // use() hook reads promises
+  const item = use(itemPromise); // use() reads promises; it can also accept React context
   return <div>{item.name}</div>;
 }
 
@@ -105,6 +117,8 @@ function ItemList() {
 
 ### Using useTransition for Updates
 
+**Caveat:** State updates that happen *after* an `await` inside a transition must be wrapped in another `startTransition` so they remain part of the transition and `isPending` stays correct. Otherwise React treats the transition as complete when the async function yields, and the subsequent state update is not tracked.
+
 ```tsx
 import { useTransition, useState } from 'react';
 
@@ -114,9 +128,11 @@ function ItemEditor({ itemId }: { itemId: number }) {
 
   const handleUpdate = async (newData: ItemData) => {
     startTransition(async () => {
-      // This update is marked as a transition
       const updated = await updateItem(itemId, newData);
-      setItem(updated);
+      // State updates after await must be wrapped in startTransition
+      startTransition(() => {
+        setItem(updated);
+      });
     });
   };
 
@@ -203,6 +219,7 @@ function ItemForm({ itemId }: { itemId: number }) {
   const [state, formAction, isPending] = useActionState(
     updateItemAction,
     null
+    // optional third arg: permalink for progressive enhancement with server/URL
   );
 
   return (
@@ -213,6 +230,52 @@ function ItemForm({ itemId }: { itemId: number }) {
         {isPending ? 'Saving...' : 'Save'}
       </button>
     </form>
+  );
+}
+```
+
+### Form with Optimistic UI (useActionState + useOptimistic)
+
+`useActionState` runs the action inside a transition, so it satisfies `useOptimistic`'s requirement. Combine them when you want both form state (pending, errors) and optimistic list/field updates:
+
+```tsx
+import { useActionState, useOptimistic } from 'react';
+
+async function addItemAction(prevState: { items: Item[]; error?: string }, formData: FormData) {
+  const newItem = { id: crypto.randomUUID(), name: formData.get('name') as string };
+  try {
+    await saveItem(newItem);
+    return { items: [...prevState.items, newItem] };
+  } catch (e) {
+    return { ...prevState, error: (e as Error).message };
+  }
+}
+
+function ItemFormWithOptimistic({ items }: { items: Item[] }) {
+  const [state, formAction, isPending] = useActionState(addItemAction, { items });
+  const [optimisticItems, addOptimisticItem] = useOptimistic(
+    state.items,
+    (current, newItem: Item) => [...current, newItem]
+  );
+
+  return (
+    <>
+      <ul>
+        {optimisticItems.map((item) => (
+          <li key={item.id}>{item.name}</li>
+        ))}
+      </ul>
+      <form
+        action={(formData) => {
+          addOptimisticItem({ id: 'temp', name: formData.get('name') as string });
+          formAction(formData);
+        }}
+      >
+        <input name="name" />
+        {state?.error && <p>{state.error}</p>}
+        <button disabled={isPending}>Add</button>
+      </form>
+    </>
   );
 }
 ```
@@ -414,8 +477,7 @@ function Modal() {
 ```tsx
 // app/items/[id]/page.tsx
 async function ItemPage({ params }: { params: { id: string } }) {
- // will block until fetchItem loads this delays when this function renders
-  const item = await fetchItem(params.id); // Direct async/await
+  const item = await fetchItem(params.id); // Blocks until fetchItem resolves, which delays when this component renders
   
   return (
     <div>
@@ -491,6 +553,8 @@ function Dashboard() {
 
 ### Error Boundaries with Async
 
+React's built-in error boundaries are class-based. The example below uses the **react-error-boundary** library for a function-component API:
+
 ```tsx
 'use client';
 
@@ -520,7 +584,7 @@ function App() {
 ## Performance Tips
 
 1. **Use Suspense boundaries strategically** - Place them around independent data sections
-2. **Cache promises** - Prevent duplicate requests with stable promise references
+2. **Cache promises and provide stable references** - `use()` requires stable promises, so cache them (e.g. with the cacheFn pattern above) and pass the same reference on each render to avoid duplicate requests and rerender issues
 3. **Use transitions for non-urgent updates** - Keep UI responsive
 4. **Optimistic updates** - Show immediate feedback while server processes
 5. **Stream server components** - Send HTML as it's ready, not all at once
@@ -580,10 +644,11 @@ function ConditionalData({ shouldLoad }: { shouldLoad: boolean }) {
   );
 }
 ```
+
 ## Sync React to Async React State Flow
 
 ```mermaid
-flowchart LR
+flowchart TD
   subgraph SR["Sync React"]
     C["useState"]
     A["useReducer"]
@@ -598,3 +663,6 @@ flowchart LR
   C --> D
   A --> B --> B1
 ```
+
+
+
