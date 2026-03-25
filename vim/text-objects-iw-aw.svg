@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 200" role="img" aria-labelledby="title desc">
+  <title id="title">inner word vs around word</title>
+  <desc id="desc">hello with iw bracket under word only, aw includes spaces</desc>
+  <defs>
+    <linearGradient id="bgt" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" style="stop-color:#1a1b26"/><stop offset="100%" style="stop-color:#16161e"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#bgt)"/>
+  <text x="40" y="40" fill="#7dcfff" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="15" font-weight="600">Text objects - </text>
+  <text x="200" y="40" fill="#bb9af7" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="15" font-weight="700">iw</text>
+  <text x="230" y="40" fill="#565f89" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="15"> vs </text>
+  <text x="270" y="40" fill="#bb9af7" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="15" font-weight="700">aw</text>
+  <text x="40" y="88" fill="#3b4261" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="24">...</text>
+  <text x="72" y="88" fill="#c0caf5" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="24" font-weight="500">  hello  world  </text>
+  <text x="40" y="120" fill="#565f89" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11">leading</text>
+  <text x="120" y="120" fill="#565f89" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11">word</text>
+  <text x="220" y="120" fill="#565f89" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11">trailing</text>
+  <!-- iw bracket -->
+  <rect x="108" y="128" width="72" height="28" rx="4" fill="none" stroke="#7aa2f7" stroke-width="2.5"/>
+  <text x="144" y="175" text-anchor="middle" fill="#7aa2f7" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="14" font-weight="700">iw</text>
+  <text x="144" y="192" text-anchor="middle" fill="#565f89" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11">inner word only</text>
+  <!-- aw bracket -->
+  <rect x="84" y="100" width="120" height="62" rx="4" fill="none" stroke="#9ece6a" stroke-width="2" stroke-dasharray="6 4" opacity="0.95"/>
+  <text x="280" y="155" fill="#9ece6a" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="14" font-weight="700">aw</text>
+  <text x="280" y="172" fill="#565f89" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11">word + adjacent space</text>
+</svg>

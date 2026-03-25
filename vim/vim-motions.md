@@ -1,6 +1,6 @@
 # Vim motions
 
-A **motion** is a command that moves the cursor or defines a text range. Motions work in **Normal** mode, combine with **operators** (`d`, `c`, `y`, `gU`, …) in **operator-pending** mode, and extend selections in **Visual** mode. For window splits, buffers, and LazyVim-specific keys, see [my-neovim.md](my-neovim.md).
+A **motion** is a command that moves the cursor or defines a text range. Motions work in **Normal** mode, combine with **operators** (`d`, `c`, `y`, `gU`, …) in **operator-pending** mode, and extend selections in **Visual** mode. For window splits, buffers, and LazyVim-specific keys, see [my-neovim.md](my-neovim.md). Diagrams below use **Markdown image** syntax (`![](file.svg)`) so Cursor/VS Code’s preview can resolve local files. Raw HTML `<img src="...">` in Markdown is often **not** rewritten for the preview webview, so those images look broken there (they may still work on GitHub). SVGs live in this same folder.
 
 ## Key legend
 
@@ -10,66 +10,13 @@ Symbols match [my-neovim.md](my-neovim.md): `⌃` Control, `⌥` Option/Alt, `�
 
 ## Motion families
 
-```mermaid
-flowchart TB
-  subgraph grid [Grid and column]
-    hjkl[h j k l]
-    pipeCol[pipe to column n]
-  end
-  subgraph words [Words]
-    wordKeys[w W e E b B ge gE]
-  end
-  subgraph lineAnchors [Line anchors]
-    zeroKeys["0 ^ g^ $ g_"]
-  end
-  subgraph vertical [Vertical structure]
-    para[sentence and paragraph]
-    sect[section motion]
-    fileJump[gg G nG]
-  end
-  subgraph screen [Screen position]
-    HL[H M L]
-    scroll[zt zz zb]
-    page[Ctrl-f Ctrl-b Ctrl-d Ctrl-u]
-    lineScroll[Ctrl-e Ctrl-y]
-  end
-  subgraph charSearch [Same-line search]
-    ftFT[f F t T]
-    repeatFT[semicolon comma]
-  end
-  subgraph pattern [Pattern search]
-    slash["slash and question"]
-    nextStar[n N star hash]
-  end
-  subgraph textObj [Text objects]
-    aroundInner[a and i objects]
-  end
-  subgraph jumps [Jumps and marks]
-    jumpList[Ctrl-o Ctrl-i]
-    percentMatch[percent pair]
-    marksMotion[m tick quote marks]
-  end
-  grid --> words
-  words --> lineAnchors
-  lineAnchors --> vertical
-  vertical --> screen
-  screen --> charSearch
-  charSearch --> pattern
-  pattern --> textObj
-  textObj --> jumps
-```
+![Motion families overview: grid through jumps and marks](motion-families.svg)
 
 ---
 
 ## Operators plus motion
 
-```mermaid
-flowchart LR
-  op[Operator d c y gU gu ...]
-  op --> pend[Operator-pending]
-  pend --> mot[Motion or text object]
-  mot --> span[Span of text]
-```
+![Operator to operator-pending to motion to text span](operator-pending.svg)
 
 Prefix a **count** before the operator or before the motion (e.g. `d3w`, `2de`) to repeat the motion that many times where it applies.
 
@@ -88,14 +35,7 @@ Prefix a **count** before the operator or before the motion (e.g. `d3w`, `2de`) 
 
 `hjkl` compass (cursor at center):
 
-```text
-        k  (up)
-        |
-   h ---+--- l
-(left)  |      (right)
-        j
-     (down)
-```
+![hjkl compass: k up, j down, h left, l right](hjkl-compass.svg)
 
 ---
 
@@ -116,13 +56,7 @@ A **word** (`w`, `b`, `e`, …) is a sequence of keyword characters (`iskeyword`
 
 Example line (`^` = landing after each `w` from line start, step by step):
 
-```text
-one.two three
-^   ^   ^
-|   |   +-- third w
-|   +------ second w
-+---------- cursor at o: first w goes to .
-```
+![w motion landings on one.two three and WORD callout](word-motions-w.svg)
 
 `WORD` on the same line: `one.two` is **one** WORD; `w` steps inside `one.two` while `W` jumps past the whole token to `three`.
 
@@ -142,14 +76,7 @@ one.two three
 | `-`  | Up to first non-blank of previous line                |
 | `_`  | Down `n-1` lines, then first non-blank (like `+` count) |
 
-```text
-      first non-blank ----v
-                          
-    |    code_here;
-    ^----+----------^----^
-    |    |          |    |
-    0    ^          $    g_
-```
+![Line anchors 0, caret, g underscore, dollar on a line with trailing spaces](line-anchors.svg)
 
 ---
 
@@ -204,13 +131,7 @@ one.two three
 | `;` | Repeat latest `f`, `F`, `t`, `T` in same direction   |
 | `,` | Repeat latest `f`, `F`, `t`, `T` in opposite direction |
 
-```text
-find the x marker
-     ^  ^    ^
-     |  |    +-- T x (stops after x, backward from right)
-     |  +------- t x (stops before x)
-     +----------- f x (on x)
-```
+![f x, t x, and T x cursor landings on find the x marker](ft-motions.svg)
 
 ---
 
@@ -249,14 +170,7 @@ find the x marker
 
 `iw` vs `aw` on a line (selection conceptually):
 
-```text
-     leading   word   trailing
-       |        |        |
-       v        v        v
-    ...  hello  world  ...
-         [==iw==]        inner word only
-       [====aw====]      around word includes space(s)
-```
+![inner word vs around word selection spans](text-objects-iw-aw.svg)
 
 Use `a"` / `i"` for double-quoted strings; similarly `a'` `i'`, `` a` `` `` i` `` for other quotes.
 

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 260" role="img" aria-labelledby="title desc">
+  <title id="title">f t T motions to letter x</title>
+  <desc id="desc">Inclusive f, exclusive t before x, T after x when searching backward</desc>
+  <defs>
+    <linearGradient id="bgf" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" style="stop-color:#1a1b26"/><stop offset="100%" style="stop-color:#16161e"/>
+    </linearGradient>
+  </defs>
+  <rect width="100%" height="100%" fill="url(#bgf)"/>
+  <text x="40" y="40" fill="#7dcfff" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="15" font-weight="600">Same-line search - target </text>
+  <text x="318" y="40" fill="#f7768e" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="15" font-weight="700">x</text>
+  <text x="40" y="88" fill="#c0caf5" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="26" font-weight="500">find the x marker</text>
+  <rect x="258" y="58" width="17" height="34" rx="2" fill="#f7768e" opacity="0.2"/>
+  <text x="40" y="130" fill="#565f89" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12">Landing columns (block cursor):</text>
+  <!-- t x: space before x ~ index 8, cw 15.2 -->
+  <rect x="250" y="142" width="12" height="20" rx="2" fill="#7aa2f7"/>
+  <text x="272" y="157" fill="#7aa2f7" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="13" font-weight="700">t x</text>
+  <text x="320" y="157" fill="#565f89" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12">before x</text>
+  <!-- f x: on x -->
+  <rect x="266" y="142" width="12" height="20" rx="2" fill="#9ece6a"/>
+  <text x="40" y="185" fill="#9ece6a" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="13" font-weight="700">f x</text>
+  <text x="78" y="185" fill="#565f89" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12">on x (inclusive)</text>
+  <!-- T x: after x, from right -->
+  <rect x="282" y="142" width="12" height="20" rx="2" fill="#bb9af7"/>
+  <text x="40" y="212" fill="#bb9af7" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="13" font-weight="700">T x</text>
+  <text x="78" y="212" fill="#565f89" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12">from right: stops after x</text>
+  <rect x="480" y="58" width="200" height="185" rx="10" fill="#24283b" stroke="#3b4261"/>
+  <text x="495" y="88" fill="#7dcfff" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12" font-weight="600">Repeat &amp; mirrors</text>
+  <text x="495" y="115" fill="#c0caf5" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12" font-weight="700">;</text>
+  <text x="512" y="115" fill="#565f89" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12"> same dir / </text>
+  <text x="600" y="115" fill="#c0caf5" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12" font-weight="700">,</text>
+  <text x="612" y="115" fill="#565f89" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12"> opposite</text>
+  <text x="495" y="145" fill="#bb9af7" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12" font-weight="700">F{c}</text>
+  <text x="535" y="145" fill="#565f89" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12"> backward inclusive</text>
+  <text x="495" y="168" fill="#bb9af7" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12" font-weight="700">T{c}</text>
+  <text x="535" y="168" fill="#565f89" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="12"> backward, before target</text>
+  <text x="495" y="198" fill="#565f89" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11">Count prefix repeats motion (e.g. </text>
+  <text x="495" y="215" fill="#7dcfff" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11">2fx</text>
+  <text x="525" y="215" fill="#565f89" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11">).</text>
+</svg>
